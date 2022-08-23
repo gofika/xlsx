@@ -39,7 +39,12 @@ func NewFileWithFont(defaultFontName string, defaultFontSize int) File {
 	return newFileWithFont(defaultFontName, defaultFontSize)
 }
 
-// OpenFile open a xlsx for operator
+// OpenFile open a xlsx file for operator
 func OpenFile(name string) (File, error) {
 	return openFile(name)
+}
+
+// OpenFileReader open a stream for operator
+func OpenFileReader(r io.ReaderAt, size int64) (File, error) {
+	return openFileReader(r, size)
 }

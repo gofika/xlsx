@@ -34,6 +34,44 @@ func newFileWithFont(defaultFontName string, defaultFontSize int) *fileImpl {
 
 // openFile open a xlsx *fileImpl
 func openFile(name string) (*fileImpl, error) {
+	// file := &fileImpl{
+	// 	xFile: &packaging.XFile{
+	// 		ContentTypes:          &packaging.XContentTypes{},
+	// 		Worksheets:            []*packaging.XWorksheet{},
+	// 		Workbook:              &packaging.XWorkbook{},
+	// 		WorkbookRelationships: &packaging.XRelationships{},
+	// 		RootRelationships:     &packaging.XRelationships{},
+	// 		ExtendedProperties:    &packaging.XExtendedProperties{},
+	// 		CoreProperties:        &packaging.XCoreProperties{},
+	// 		Themes:                []*packaging.XTheme{},
+	// 		StyleSheet:            &packaging.XStyleSheet{},
+	// 		SharedStrings:         &packaging.XSharedStrings{},
+	// 	},
+	// }
+	// r, err := zip.OpenReader(name)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// err = file.readParts(&r.Reader)
+	// _ = r.Close()
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// return file, nil
+	f, err := os.Open(name)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	fi, err := f.Stat()
+	if err != nil {
+		return nil, err
+	}
+	return openFileReader(f, fi.Size())
+}
+
+// openFile open a xlsx *fileImpl
+func openFileReader(r io.ReaderAt, size int64) (*fileImpl, error) {
 	file := &fileImpl{
 		xFile: &packaging.XFile{
 			ContentTypes:          &packaging.XContentTypes{},
@@ -48,12 +86,11 @@ func openFile(name string) (*fileImpl, error) {
 			SharedStrings:         &packaging.XSharedStrings{},
 		},
 	}
-	r, err := zip.OpenReader(name)
+	zr, err := zip.NewReader(r, size)
 	if err != nil {
 		return nil, err
 	}
-	err = file.readParts(&r.Reader)
-	_ = r.Close()
+	err = file.readParts(zr)
 	if err != nil {
 		return nil, err
 	}
