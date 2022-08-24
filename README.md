@@ -93,13 +93,11 @@ func main() {
 
 - [x] Basic File Format
 - [x] File: NewFile, OpenFile, SaveFile, Save, Sheets
-- [ ] Sheet:
+- [x] Sheet:
     - [x] NewSheet, OpenSheet
     - [x] SetCellValue, GetCellString, GetCellInt, Cell, AxisCell
-    - [ ] ...
-- [ ] Cell:
+- [x] Cell:
     - [x] Row, Col
     - [x] SetValue, SetIntValue, SetFloatValue, SetFloatValuePrec, SetStringValue, SetBoolValue, SetDefaultValue, SetTimeValue, SetDateValue, SetDurationValue
     - [x] GetIntValue, GetStringValue
     - [x] SetNumberFormat
-    - [ ] ...
