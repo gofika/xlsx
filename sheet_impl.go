@@ -1,6 +1,8 @@
 package xlsx
 
 import (
+	"fmt"
+
 	"github.com/gofika/xlsx/packaging"
 )
 
@@ -129,6 +131,9 @@ func (s *sheetImpl) prepareCell(col, row int) *packaging.XC {
 		R: cellName,
 	}
 	r.C = append(r.C, cell)
+	if len(r.C) > 1 {
+		r.Spans = fmt.Sprintf("1:%d", len(r.C))
+	}
 
 	// prepare cell style
 	worksheet := s.getWorksheet()

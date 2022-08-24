@@ -9,11 +9,13 @@ import (
 // sharedStrings shared strings operator
 type sharedStrings struct {
 	file *fileImpl
+	ss   map[string]int
 }
 
 func newSharedStrings(file *fileImpl) *sharedStrings {
 	return &sharedStrings{
 		file: file,
+		ss:   make(map[string]int),
 	}
 }
 
@@ -31,11 +33,15 @@ func (s *sharedStrings) Append(str string) (stringID string) {
 	sst := s.getSharedStrings()
 	needUpdateRelationships := sst.Count == 0
 	sst.Count++ // ref count
-	for i, si := range sst.Si {
-		if str == si.T { // has exist one
-			return strconv.Itoa(i + 1)
-		}
+	// for i, si := range sst.Si {
+	// 	if str == si.T { // has exist one
+	// 		return strconv.Itoa(i + 1)
+	// 	}
+	// }
+	if idx, ok := s.ss[str]; ok {
+		return strconv.Itoa(idx)
 	}
+
 	// need create new one
 	sst.Si = append(sst.Si, &packaging.XSi{
 		T: str,
@@ -45,6 +51,8 @@ func (s *sharedStrings) Append(str string) (stringID string) {
 		},
 	})
 	sst.UniqueCount++
+	id := sst.UniqueCount - 1
+	s.ss[str] = id
 
 	if needUpdateRelationships { // need update relationships
 		file := s.getFile()
@@ -54,7 +62,7 @@ func (s *sharedStrings) Append(str string) (stringID string) {
 		// update [Content_Types].xml
 		file.ContentTypes = packaging.NewXContentTypes(file.WorkbookRelationships)
 	}
-	return strconv.Itoa(sst.UniqueCount - 1)
+	return strconv.Itoa(id)
 }
 
 func (s *sharedStrings) Get(stringID string) string {
@@ -64,4 +72,12 @@ func (s *sharedStrings) Get(stringID string) string {
 		return ""
 	}
 	return sst.Si[si].T
+}
+
+func (s *sharedStrings) calcMap() {
+	sst := s.getSharedStrings()
+	s.ss = make(map[string]int)
+	for i, si := range sst.Si {
+		s.ss[si.T] = i
+	}
 }

@@ -18,12 +18,15 @@ import (
 // fileImpl define for operation xlsx file
 type fileImpl struct {
 	xFile *packaging.XFile
+	ss    *sharedStrings
 }
 
 func newFile() *fileImpl {
-	return &fileImpl{
+	f := &fileImpl{
 		xFile: packaging.NewDefaultFile("Microsoft YaHei", 11),
 	}
+	f.ss = newSharedStrings(f)
+	return f
 }
 
 func newFileWithFont(defaultFontName string, defaultFontSize int) *fileImpl {
@@ -352,6 +355,8 @@ func (f *fileImpl) readParts(zipReader *zip.Reader) (err error) {
 	if err != nil {
 		return
 	}
+	// init data
+	f.ss.calcMap()
 	return
 }
 

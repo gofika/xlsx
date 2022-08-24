@@ -44,7 +44,8 @@ func (c *cellImpl) getCell() *packaging.XC {
 }
 
 func (c *cellImpl) getSharedStrings() *sharedStrings {
-	return newSharedStrings(c.sheet.file)
+	// return newSharedStrings(c.sheet.file)
+	return c.sheet.file.ss
 }
 
 func (c *cellImpl) prepareCell() *packaging.XC {
