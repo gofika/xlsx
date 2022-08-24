@@ -30,9 +30,11 @@ func newFile() *fileImpl {
 }
 
 func newFileWithFont(defaultFontName string, defaultFontSize int) *fileImpl {
-	return &fileImpl{
+	f := &fileImpl{
 		xFile: packaging.NewDefaultFile(defaultFontName, defaultFontSize),
 	}
+	f.ss = newSharedStrings(f)
+	return f
 }
 
 // openFile open a xlsx *fileImpl
@@ -75,7 +77,7 @@ func openFile(name string) (*fileImpl, error) {
 
 // openFile open a xlsx *fileImpl
 func openFileReader(r io.ReaderAt, size int64) (*fileImpl, error) {
-	file := &fileImpl{
+	f := &fileImpl{
 		xFile: &packaging.XFile{
 			ContentTypes:          &packaging.XContentTypes{},
 			Worksheets:            []*packaging.XWorksheet{},
@@ -89,15 +91,16 @@ func openFileReader(r io.ReaderAt, size int64) (*fileImpl, error) {
 			SharedStrings:         &packaging.XSharedStrings{},
 		},
 	}
+	f.ss = newSharedStrings(f)
 	zr, err := zip.NewReader(r, size)
 	if err != nil {
 		return nil, err
 	}
-	err = file.readParts(zr)
+	err = f.readParts(zr)
 	if err != nil {
 		return nil, err
 	}
-	return file, nil
+	return f, nil
 }
 
 // SaveFile save xlsx file
