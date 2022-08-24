@@ -92,7 +92,7 @@ func main() {
 ## TODO:
 
 - [x] Basic File Format
-- [x] File: NewFile, OpenFile, SaveFile, Write, Sheets
+- [x] File: NewFile, OpenFile, SaveFile, Save, Sheets
 - [ ] Sheet:
     - [x] NewSheet, OpenSheet
     - [x] SetCellValue, GetCellString, GetCellInt, Cell, AxisCell
