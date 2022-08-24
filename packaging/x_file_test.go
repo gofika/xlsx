@@ -5,7 +5,7 @@ import (
 )
 
 func TestFile(t *testing.T) {
-	file := NewDefaultFile("Microsoft YaHei", 11)
+	file := NewDefaultFile("Microsoft YaHei", 11, "Sheet1")
 	testTheme(t, file)
 	testNewXContentTypes(t, file)
 	testNewDefaultXCoreProperties(t, file)

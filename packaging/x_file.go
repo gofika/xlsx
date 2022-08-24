@@ -20,7 +20,7 @@ type XFile struct {
 }
 
 // NewDefaultFile create *XFile with default template
-func NewDefaultFile(defaultFontName string, defaultFontSize int) (file *XFile) {
+func NewDefaultFile(defaultFontName string, defaultFontSize int, sheetName string) (file *XFile) {
 	sheet1 := NewDefaultXWorksheet()
 	worksheets := []*XWorksheet{sheet1}
 
@@ -36,7 +36,7 @@ func NewDefaultFile(defaultFontName string, defaultFontSize int) (file *XFile) {
 	}
 
 	file.WorkbookRelationships = NewWorkbookXRelationships(file)
-	Workbook := NewXWorkbook(file.WorkbookRelationships)
+	Workbook := NewXWorkbook(file.WorkbookRelationships, sheetName)
 	file.Workbook = Workbook
 	file.ExtendedProperties = NewXExtendedProperties(Workbook)
 	file.ContentTypes = NewXContentTypes(file.WorkbookRelationships)

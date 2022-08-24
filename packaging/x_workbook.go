@@ -2,7 +2,6 @@ package packaging
 
 import (
 	"encoding/xml"
-	"fmt"
 )
 
 // Workbook Defines
@@ -73,7 +72,7 @@ type XCalcPr struct {
 }
 
 // NewXWorkbook create *XWorkbook from WorksheetRelationships
-func NewXWorkbook(worksheetRelations *XRelationships) (workbook *XWorkbook) {
+func NewXWorkbook(worksheetRelations *XRelationships, sheetName string) (workbook *XWorkbook) {
 	workbook = &XWorkbook{
 		XmlnsR:      "http://schemas.openxmlformats.org/officeDocument/2006/relationships",
 		XmlnsMC:     "http://schemas.openxmlformats.org/markup-compatibility/2006",
@@ -108,7 +107,7 @@ func NewXWorkbook(worksheetRelations *XRelationships) (workbook *XWorkbook) {
 			continue
 		}
 		workbook.Sheets.Sheet = append(workbook.Sheets.Sheet, &XSheet{
-			Name:    fmt.Sprintf("Sheet%d", relationship.Index),
+			Name:    sheetName,
 			SheetID: relationship.Index,
 			Rid:     relationship.ID,
 		})

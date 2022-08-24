@@ -12,6 +12,13 @@ func TestNewFile(t *testing.T) {
 	assert.Nil(t, err)
 }
 
+func TestNewFileSheet(t *testing.T) {
+	customSheetName := "MySheet"
+	f := NewFile(WithDefaultSheetName(customSheetName))
+	sheet := f.OpenSheet(customSheetName)
+	assert.NotNil(t, sheet)
+}
+
 func TestOpenFile(t *testing.T) {
 	f, err := OpenFile("test_docs/two_sheet.xlsx")
 	assert.Nil(t, err)

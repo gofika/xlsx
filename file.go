@@ -2,13 +2,19 @@ package xlsx
 
 import "io"
 
+var (
+	DefaultSheetName = "Sheet1"
+	DefaultFontName  = "Microsoft YaHei"
+	DefaultFontSize  = 11
+)
+
 // File define for operation xlsx file
 type File interface {
 	// SaveFile save xlsx file
 	SaveFile(name string) error
 
-	// Write save to steam
-	Write(w io.Writer) error
+	// Save save to steam
+	Save(w io.Writer) error
 
 	// OpenSheet open a exist Sheet by name
 	//
@@ -29,14 +35,9 @@ type File interface {
 	Sheets() []Sheet
 }
 
-// NewFile create a default xlsx File with default template
-func NewFile() File {
-	return newFile()
-}
-
-// NewFileWithFont create a default xlsx File with font
-func NewFileWithFont(defaultFontName string, defaultFontSize int) File {
-	return newFileWithFont(defaultFontName, defaultFontSize)
+// NewFile create a xlsx File
+func NewFile(opts ...Option) File {
+	return newFile(opts...)
 }
 
 // OpenFile open a xlsx file for operator

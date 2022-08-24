@@ -12,6 +12,7 @@ import (
 	"strconv"
 
 	"github.com/gofika/util/gobutil"
+	"github.com/gofika/xlsx/internal"
 	"github.com/gofika/xlsx/packaging"
 )
 
@@ -21,17 +22,17 @@ type fileImpl struct {
 	ss    *sharedStrings
 }
 
-func newFile() *fileImpl {
-	f := &fileImpl{
-		xFile: packaging.NewDefaultFile("Microsoft YaHei", 11),
+func newFile(opts ...Option) *fileImpl {
+	o := internal.Settings{
+		DefaultFontName:  DefaultFontName,
+		DefaultFontSize:  DefaultFontSize,
+		DefaultSheetName: DefaultSheetName,
 	}
-	f.ss = newSharedStrings(f)
-	return f
-}
-
-func newFileWithFont(defaultFontName string, defaultFontSize int) *fileImpl {
+	for _, opt := range opts {
+		opt.Apply(&o)
+	}
 	f := &fileImpl{
-		xFile: packaging.NewDefaultFile(defaultFontName, defaultFontSize),
+		xFile: packaging.NewDefaultFile(o.DefaultFontName, o.DefaultFontSize, o.DefaultSheetName),
 	}
 	f.ss = newSharedStrings(f)
 	return f
@@ -39,30 +40,6 @@ func newFileWithFont(defaultFontName string, defaultFontSize int) *fileImpl {
 
 // openFile open a xlsx *fileImpl
 func openFile(name string) (*fileImpl, error) {
-	// file := &fileImpl{
-	// 	xFile: &packaging.XFile{
-	// 		ContentTypes:          &packaging.XContentTypes{},
-	// 		Worksheets:            []*packaging.XWorksheet{},
-	// 		Workbook:              &packaging.XWorkbook{},
-	// 		WorkbookRelationships: &packaging.XRelationships{},
-	// 		RootRelationships:     &packaging.XRelationships{},
-	// 		ExtendedProperties:    &packaging.XExtendedProperties{},
-	// 		CoreProperties:        &packaging.XCoreProperties{},
-	// 		Themes:                []*packaging.XTheme{},
-	// 		StyleSheet:            &packaging.XStyleSheet{},
-	// 		SharedStrings:         &packaging.XSharedStrings{},
-	// 	},
-	// }
-	// r, err := zip.OpenReader(name)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// err = file.readParts(&r.Reader)
-	// _ = r.Close()
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// return file, nil
 	f, err := os.Open(name)
 	if err != nil {
 		return nil, err
@@ -109,7 +86,7 @@ func (f *fileImpl) SaveFile(name string) error {
 	if err != nil {
 		return nil
 	}
-	err = f.Write(file)
+	err = f.Save(file)
 	errClose := file.Close()
 	if err != nil {
 		return err
@@ -117,8 +94,8 @@ func (f *fileImpl) SaveFile(name string) error {
 	return errClose
 }
 
-// Write save to steam
-func (f *fileImpl) Write(w io.Writer) error {
+// Save save to steam
+func (f *fileImpl) Save(w io.Writer) error {
 	zipWriter := zip.NewWriter(w)
 	zipWriter.RegisterCompressor(zip.Deflate, func(out io.Writer) (io.WriteCloser, error) {
 		return flate.NewWriter(out, flate.BestCompression)
