@@ -10,6 +10,7 @@ type XStyleSheetU struct {
 	XmlnsX14ac  string   `xml:"x14ac,attr"`
 	XmlnsX16r2  string   `xml:"x16r2,attr"`
 
+	NumFmts      *XNumFmtsU          `xml:"numFmts,omitempty"`
 	Fonts        *XFontsU            `xml:"fonts"`
 	Fills        *XFillsU            `xml:"fills"`
 	Borders      *XBordersU          `xml:"borders"`
@@ -19,7 +20,6 @@ type XStyleSheetU struct {
 	Dxfs         *XDxfsU             `xml:"dxfs"`
 	TableStyles  *XTableStylesU      `xml:"tableStyles"`
 	ExtLst       *XStyleSheetExtLstU `xml:"extLst"`
-	NumFmts      *XNumFmtsU          `xml:"numFmts,omitempty"`
 }
 
 // XFontsU fix XML ns for XFonts

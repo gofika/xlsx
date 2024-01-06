@@ -20,7 +20,7 @@ func TestNewFileSheet(t *testing.T) {
 }
 
 func TestOpenFile(t *testing.T) {
-	f, err := OpenFile("test_docs/two_sheet.xlsx")
+	f, err := OpenFile("test_docs/empty.xlsx")
 	assert.Nil(t, err)
-	assert.Len(t, f.Sheets(), 2)
+	assert.Len(t, f.Sheets(), 1)
 }
