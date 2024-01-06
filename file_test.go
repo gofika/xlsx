@@ -1,6 +1,7 @@
 package xlsx
 
 import (
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -8,7 +9,9 @@ import (
 
 func TestNewFile(t *testing.T) {
 	f := NewFile()
-	err := f.SaveFile("test_docs/empty.xlsx")
+	err := os.MkdirAll("test_docs", os.ModePerm)
+	assert.Nil(t, err)
+	err = f.SaveFile("test_docs/empty.xlsx")
 	assert.Nil(t, err)
 }
 
