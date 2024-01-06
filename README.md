@@ -7,7 +7,7 @@
 
 # xlsx
 
-Microsoft .xlsx read/write for golang
+Microsoft .xlsx read/write for golang with high performance
 
 ## Basic Usage
 
@@ -34,29 +34,41 @@ package main
 
 import (
     "fmt"
-    "github.com/gofika/xlsx"
     "time"
+
+    "github.com/gofika/xlsx"
 )
 
 func main() {
-    f := xlsx.NewFile()
+    doc := xlsx.NewFile()
 
-    sheet := f.NewSheet("Sheet2")
-    sheet.SetCellValue(xlsx.ColumnNumber("A"), 1, "Name")
-    sheet.SetCellValue(xlsx.ColumnNumber("A"), 2, "Jason")
-    sheet.SetCellValue(xlsx.ColumnNumber("B"), 1, "Score")
-    sheet.SetCellValue(xlsx.ColumnNumber("B"), 2, 100)
-    // date value
-    sheet.SetCellValue(3, 1, "Date")
-    sheet.Cell(3, 2).SetDateValue(time.Date(1980, 9, 8, 0, 0, 0, 0, time.Local))
+    // open default sheet "Sheet1"
+    sheet := doc.OpenSheet("Sheet1")
+
+    // write values
+	valueCol := ColumnNumber("B")
+    sheet.SetCellValue(xlsx.ColumnNumber("A"), 1, "Name") // A1 = Name
+    sheet.SetCellValue(xlsx.ColumnNumber("A"), 2, "Jason") // A2 = Json
+    sheet.SetCellValue(xlsx.ColumnNumber("B"), 1, "Score") // B1 = Score
+    sheet.SetCellValue(xlsx.ColumnNumber("B"), 2, 100) // B2 = 100
+
     // time value
-    sheet.AxisCell("D1").SetStringValue("LastTime")
-    sheet.AxisCell("D2").
-        SetTimeValue(time.Now()).
-        SetNumberFormat("yyyy-mm-dd hh:mm:ss")
+    sheet.SetAxisCellValue("C1", "Date") // C1 = Date
+    sheet.SetAxisCellValue("C2", time.Date(1980, 9, 8, 23, 40, 10, 40, time.UTC)) // C2 = 1980-09-08 23:40
 
-    if err := f.SaveFile("Document1.xlsx"); err != nil {
-        fmt.Println(err)
+    // duration value
+    sheet.SetAxisCellValue("D1", "Duration") // D1 = Duration
+    sheet.SetAxisCellValue("D2", 30*time.Second) // D2 = 00:00:30
+
+    // time value with custom format
+    sheet.AxisCell("E1").SetStringValue("LastTime") // D1 = LastTime
+    sheet.AxisCell("E2").
+        SetTimeValue(time.Now()).
+        SetNumberFormat("yyyy-mm-dd hh:mm:ss") // D2 = 2022-08-23 20:08:08 (your current time)
+
+    // save to file
+    if err := doc.SaveFile("Document1.xlsx"); err != nil {
+        panic(err)
     }
 }
 ```
@@ -70,24 +82,88 @@ package main
 
 import (
     "fmt"
+
     "github.com/gofika/xlsx"
 )
 
 func main() {
-    f, err := xlsx.OpenFile("Document1.xlsx")
+    // open exists document
+    doc, err := xlsx.OpenFile("Document1.xlsx")
     if err != nil {
-        fmt.Println(err)
+        panic(err)
         return
     }
 
-    sheet := f.OpenSheet("Sheet2")
-    A1 := sheet.GetCellString(1, 1)
-    fmt.Println(A1)
+    // open exists sheet
+    sheet := doc.OpenSheet("Sheet2")
 
+    // read cell string
+    a1String := sheet.GetCellString(1, 1)
+    fmt.Println(a1String)
+
+    // cell object read
     cell := sheet.AxisCell("B2")
     fmt.Println(cell.GetIntValue())
 }
 ```
+
+### Write spreadsheet as stream
+
+Write document as a stream.
+
+```go
+package main
+
+import (
+    "io"
+    "os"
+
+    "github.com/gofika/xlsx"
+)
+
+func main() {
+    // open file to write
+    f, err := os.OpenFile("Document1.xlsx", os.O_CREATE|os.O_WRONLY, 0644)
+    if err != nil {
+        panic(err)
+    }
+    defer f.Close()
+
+    doc := xlsx.NewFile()
+
+    // do something with doc
+    // ...
+
+    // write to file or any io.Writer as stream
+    doc.Save(f)
+}
+```
+
+### NewFile with options
+
+You can specify default configurations when calling **xlsx.NewFile**.
+
+```go
+
+package main
+
+import (
+    "io"
+    "os"
+
+    "github.com/gofika/xlsx"
+)
+
+func main() {
+    // set document: default font name, default font size, default sheet name
+    doc := xlsx.NewFile(xlsx.WithDefaultFontName("Arial"), xlsx.WithDefaultFontSize(12), xlsx.WithDefaultSheetName("Tab1"))
+
+    // do something with doc
+    // ...
+}
+```
+
+
 
 ## TODO:
 
@@ -95,7 +171,7 @@ func main() {
 - [x] File: NewFile, OpenFile, SaveFile, Save, Sheets
 - [x] Sheet:
     - [x] NewSheet, OpenSheet
-    - [x] SetCellValue, GetCellString, GetCellInt, Cell, AxisCell
+    - [x] SetCellValue, GetCellString, GetCellInt, Cell, AxisCell, SetAxisCellValue
 - [x] Cell:
     - [x] Row, Col
     - [x] SetValue, SetIntValue, SetFloatValue, SetFloatValuePrec, SetStringValue, SetBoolValue, SetDefaultValue, SetTimeValue, SetDateValue, SetDurationValue

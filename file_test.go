@@ -13,7 +13,7 @@ func TestNewFile(t *testing.T) {
 }
 
 func TestNewFileSheet(t *testing.T) {
-	customSheetName := "MySheet"
+	const customSheetName = "MySheet"
 	f := NewFile(WithDefaultSheetName(customSheetName))
 	sheet := f.OpenSheet(customSheetName)
 	assert.NotNil(t, sheet)

@@ -46,6 +46,19 @@ func (s *sheetImpl) SetCellValue(col, row int, value any) (cell Cell) {
 	return
 }
 
+// SetAxisCellValue set cell value
+//
+// Example:
+//
+//	sheet.SetAxisCellValue("A1", "val") // A1 => "val"
+//	sheet.SetAxisCellValue("B3", 98.01) // B3 => 98.01
+//	sheet.SetAxisCellValue("C1", 1000) // C1 => 1000
+//	sheet.SetAxisCellValue("D4", time.Now()) // D4 => "2021-03-11 05:19"
+func (s *sheetImpl) SetAxisCellValue(axis Axis, value any) (cell Cell) {
+	cell = s.Cell(axis.C()).SetValue(value)
+	return
+}
+
 // GetCellString get cell value of string
 //
 // Example:
@@ -130,10 +143,29 @@ func (s *sheetImpl) prepareCell(col, row int) *packaging.XC {
 	cell = &packaging.XC{
 		R: cellName,
 	}
-	r.C = append(r.C, cell)
-	if len(r.C) > 1 {
-		r.Spans = fmt.Sprintf("1:%d", len(r.C))
+
+	// insert cell to row
+	inserted := false
+	for i, c := range r.C {
+		cCol, _ := CellNameToCoordinates(c.R)
+		if cCol > col {
+			r.C = append(r.C[:i], append([]*packaging.XC{cell}, r.C[i:]...)...)
+			inserted = true
+		}
 	}
+	if !inserted {
+		r.C = append(r.C, cell)
+	}
+
+	// calc spans
+	maxCol := 1
+	for _, c := range r.C {
+		spanCol, _ := CellNameToCoordinates(c.R)
+		if spanCol > maxCol {
+			maxCol = spanCol
+		}
+	}
+	r.Spans = fmt.Sprintf("1:%d", maxCol)
 
 	// prepare cell style
 	worksheet := s.getWorksheet()
@@ -208,6 +240,8 @@ func (s *sheetImpl) prepareNumberingFormat(formatCode string) (numFmtID int) {
 		}
 	}
 	// create new numFmt
+	// formatCode = strings.ReplaceAll(formatCode, "-", "\\-")
+	// formatCode = strings.ReplaceAll(formatCode, " ", "\\ ")
 	numFmt := &packaging.XNumFmt{
 		FormatCode: formatCode,
 		NumFmtId:   1000 + len(styleSheet.NumFmts.NumFmt),

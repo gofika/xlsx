@@ -8,8 +8,17 @@ type Sheet interface {
 	//     sheet.SetCellValue(1, 1, "val") // A1 => "val"
 	//     sheet.SetCellValue(2, 3, 98.01) // B3 => 98.01
 	//     sheet.SetCellValue(3, 1, 1000) // C1 => 1000
-	//     sheet.SetCellValue(4, 4, time.Now()) // D4 => "2021-03-11 05:19:16.483"
+	//     sheet.SetCellValue(4, 4, time.Now()) // D4 => "2021-03-11 05:19"
 	SetCellValue(col, row int, value any) Cell
+
+	// SetAxisCellValue set cell value
+	//
+	// Example:
+	//     sheet.SetAxisCellValue("A1", "val") // A1 => "val"
+	//     sheet.SetAxisCellValue("B3", 98.01) // B3 => 98.01
+	//     sheet.SetAxisCellValue("C1", 1000) // C1 => 1000
+	//     sheet.SetAxisCellValue("D4", time.Now()) // D4 => "2021-03-11 05:19"
+	SetAxisCellValue(axis Axis, value any) Cell
 
 	// GetCellString get cell value of string
 	//

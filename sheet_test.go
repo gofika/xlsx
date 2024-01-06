@@ -26,17 +26,25 @@ func TestSetCellValue(t *testing.T) {
 	f := NewFile()
 
 	sheet := f.OpenSheet("Sheet1")
-	sheet.SetCellValue(ColumnNumber("A"), 1, "Name")
-	sheet.SetCellValue(ColumnNumber("B"), 1, "Score")
-	sheet.SetCellValue(ColumnNumber("A"), 2, "Jason")
-	sheet.SetCellValue(ColumnNumber("B"), 2, 100)
 
-	sheet.SetCellValue(ColumnNumber("C"), 3, 200.50)
-	sheet.SetCellValue(ColumnNumber("D"), 3, time.Date(1980, 9, 8, 23, 40, 10, 40, time.Local))
-	sheet.SetCellValue(ColumnNumber("E"), 4, 10*time.Second)
+	// table example
+	const titleRow = 1
+	const valueRow = 2
+	nameCol := ColumnNumber("A")
+	valueCol := ColumnNumber("B")
+	sheet.SetCellValue(nameCol, titleRow, "Name")
+	sheet.SetCellValue(valueCol, titleRow, "Score")
+	sheet.SetCellValue(nameCol, valueRow, "Jason")
+	sheet.SetCellValue(valueCol, valueRow, 100)
 
+	// SetAxisCellValue example
+	sheet.SetAxisCellValue("C3", 200.50)
+	sheet.SetAxisCellValue("D3", time.Date(1980, 9, 8, 23, 40, 10, 40, time.UTC))
+	sheet.SetAxisCellValue("E4", 10*time.Second)
+
+	// cell operator method
 	sheet.AxisCell("D4").
-		SetTimeValue(time.Date(1980, 9, 8, 23, 40, 10, 40, time.Local)).
+		SetTimeValue(time.Date(1980, 9, 8, 23, 40, 10, 40, time.UTC)).
 		SetNumberFormat("yyyy-mm-dd hh:mm:ss")
 	err := f.SaveFile(docPath)
 	assert.Nil(t, err)

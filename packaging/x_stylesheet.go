@@ -48,6 +48,7 @@ type XStyleSheet struct {
 	XmlnsX14ac  string   `xml:"xmlns:x14ac,attr"`
 	XmlnsX16r2  string   `xml:"xmlns:x16r2,attr"`
 
+	NumFmts      *XNumFmts          `xml:"numFmts,omitempty"` // Number Formats
 	Fonts        *XFonts            `xml:"fonts"`             // Fonts
 	Fills        *XFills            `xml:"fills"`             // Fills
 	Borders      *XBorders          `xml:"borders"`           // Borders
@@ -57,7 +58,6 @@ type XStyleSheet struct {
 	Dxfs         *XDxfs             `xml:"dxfs"`              // Formats
 	TableStyles  *XTableStyles      `xml:"tableStyles"`       // Table Styles
 	ExtLst       *XStyleSheetExtLst `xml:"extLst"`            // Future Feature Data Storage Area
-	NumFmts      *XNumFmts          `xml:"numFmts,omitempty"` // Number Formats
 	//Colors       *XColors           `xml:"x:colors"` // Colors
 }
 
