@@ -1,6 +1,10 @@
 package xlsx
 
-import "time"
+import (
+	"time"
+
+	"github.com/shopspring/decimal"
+)
 
 // Cell cell operator
 type Cell interface {
@@ -24,6 +28,7 @@ type Cell interface {
 	//     uint64
 	//     float32
 	//     float64
+	//     decimal.Decimal
 	//     string
 	//     []byte
 	//     time.Duration
@@ -43,20 +48,26 @@ type Cell interface {
 	// GetIntValue get cell value with int type
 	GetIntValue() int
 
-	// SetFloatValue set cell for float64 type
-	SetFloatValue(value float64) Cell
+	// SetFloatValue set cell for decimal.Decimal type
+	SetFloatValue(value decimal.Decimal) Cell
 
-	// SetFloatValuePrec set cell for float64 type with pres
-	SetFloatValuePrec(value float64, prec int, bitSize int) Cell
+	// SetFloatValuePrec set cell for decimal.Decimal type with pres
+	SetFloatValuePrec(value decimal.Decimal, prec int) Cell
 
-	// GetStringValue get cell value with string type
-	GetStringValue() string
+	// GetFloatValue get cell value with decimal.Decimal type
+	GetFloatValue() decimal.Decimal
 
 	// SetStringValue set cell value for string type
 	SetStringValue(value string) Cell
 
+	// GetStringValue get cell value with string type
+	GetStringValue() string
+
 	// SetBoolValue set cell value for bool type
 	SetBoolValue(value bool) Cell
+
+	// GetBoolValue get cell value with bool type
+	GetBoolValue() bool
 
 	// SetDefaultValue set cell value without any type
 	SetDefaultValue(value string) Cell
@@ -64,11 +75,17 @@ type Cell interface {
 	// SetTimeValue set cell value for time.Time type
 	SetTimeValue(value time.Time) Cell
 
+	// GetTimeValue get cell value with time.Time type
+	GetTimeValue() time.Time
+
 	// SetDateValue set cell value for time.Time type with date format
 	SetDateValue(value time.Time) Cell
 
 	// SetDurationValue set cell value for time.Duration type
 	SetDurationValue(value time.Duration) Cell
+
+	// GetDurationValue get cell value with time.Duration type
+	GetDurationValue() time.Duration
 
 	// SetNumberFormat set cell number format with format code
 	// https://docs.microsoft.com/en-us/dotnet/api/documentformat.openxml.spreadsheet.numberingformat?view=openxml-2.8.1

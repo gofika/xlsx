@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gofika/xlsx/packaging"
+	"github.com/shopspring/decimal"
 )
 
 // sheetImpl sheet operator
@@ -57,24 +58,6 @@ func (s *sheetImpl) SetCellValue(col, row int, value any) (cell Cell) {
 func (s *sheetImpl) SetAxisCellValue(axis Axis, value any) (cell Cell) {
 	cell = s.Cell(axis.C()).SetValue(value)
 	return
-}
-
-// GetCellString get cell value of string
-//
-// Example:
-//
-//	sheet.GetCellString(1, 1) // A1 => "val"
-func (s *sheetImpl) GetCellString(col, row int) string {
-	return s.Cell(col, row).GetStringValue()
-}
-
-// GetCellInt get cell value of string
-//
-// Example:
-//
-//	sheet.GetCellInt(3, 1) // C1 => 1000
-func (s *sheetImpl) GetCellInt(col, row int) int {
-	return s.Cell(col, row).GetIntValue()
 }
 
 // cell get cell by cell name
@@ -146,15 +129,16 @@ func (s *sheetImpl) prepareCell(col, row int) *packaging.XC {
 
 	// insert cell to row
 	inserted := false
-	for i, c := range r.C {
-		cCol, _ := CellNameToCoordinates(c.R)
-		if cCol > col {
-			r.C = append(r.C[:i], append([]*packaging.XC{cell}, r.C[i:]...)...)
+	for i := len(r.C) - 1; i >= 0; i-- {
+		cCol, _ := CellNameToCoordinates(r.C[i].R)
+		if cCol < col {
+			r.C = append(r.C[:i+1], append([]*packaging.XC{cell}, r.C[i+1:]...)...)
 			inserted = true
+			break
 		}
 	}
 	if !inserted {
-		r.C = append(r.C, cell)
+		r.C = append([]*packaging.XC{cell}, r.C...)
 	}
 
 	// calc spans
@@ -240,8 +224,6 @@ func (s *sheetImpl) prepareNumberingFormat(formatCode string) (numFmtID int) {
 		}
 	}
 	// create new numFmt
-	// formatCode = strings.ReplaceAll(formatCode, "-", "\\-")
-	// formatCode = strings.ReplaceAll(formatCode, " ", "\\ ")
 	numFmt := &packaging.XNumFmt{
 		FormatCode: formatCode,
 		NumFmtId:   1000 + len(styleSheet.NumFmts.NumFmt),
@@ -249,4 +231,52 @@ func (s *sheetImpl) prepareNumberingFormat(formatCode string) (numFmtID int) {
 	styleSheet.NumFmts.NumFmt = append(styleSheet.NumFmts.NumFmt, numFmt)
 	styleSheet.NumFmts.Count = len(styleSheet.NumFmts.NumFmt)
 	return numFmt.NumFmtId
+}
+
+// SetColumnWidth set column width
+//
+// Example:
+//
+//	sheet.SetColumnWidth("A:B", 20)
+func (s *sheetImpl) SetColumnWidth(columnRange string, width int) Sheet {
+	min, max := ColumnRange(columnRange)
+	if min == 0 || max == 0 {
+		return s
+	}
+	worksheet := s.getWorksheet()
+	if worksheet.Cols == nil {
+		worksheet.Cols = &packaging.XCols{
+			Col: []*packaging.XCol{},
+		}
+	}
+	for _, c := range worksheet.Cols.Col {
+		if c.Min == min && c.Max == max {
+			c.Width = decimal.NewFromInt32(int32(width))
+			return s
+		}
+	}
+	worksheet.Cols.Col = append(worksheet.Cols.Col, &packaging.XCol{
+		Min:   min,
+		Max:   max,
+		Width: decimal.NewFromInt32(int32(width)),
+	})
+	return s
+}
+
+// GetColumnWidth get column width
+//
+// Example:
+//
+//	sheet.GetColumnWidth("A") // returns 20
+func (s *sheetImpl) GetColumnWidth(columnName string) int {
+	col := ColumnNumber(columnName)
+	worksheet := s.getWorksheet()
+	if worksheet.Cols != nil {
+		for _, c := range worksheet.Cols.Col {
+			if c.Min <= col && col <= c.Max {
+				return int(c.Width.IntPart())
+			}
+		}
+	}
+	return 0
 }

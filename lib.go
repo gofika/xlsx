@@ -117,3 +117,23 @@ func trimSheetName(name string) string {
 	}
 	return name
 }
+
+// ColumnRange parse column range
+//
+// Example:
+//
+//	xlsx.ColumnRange("A:Z") // returns 1, 26
+//	xlsx.ColumnRange("Z:A") // returns 1, 26
+func ColumnRange(columnRange string) (min, max int) {
+	re := regexp.MustCompile(`^([A-Z]+):([A-Z]+)$`)
+	mcs := re.FindStringSubmatch(columnRange)
+	if len(mcs) < 3 {
+		return 0, 0
+	}
+	min = ColumnNumber(mcs[1])
+	max = ColumnNumber(mcs[2])
+	if max < min {
+		min, max = max, min
+	}
+	return
+}

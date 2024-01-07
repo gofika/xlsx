@@ -1,6 +1,10 @@
 package packaging
 
-import "encoding/xml"
+import (
+	"encoding/xml"
+
+	"github.com/shopspring/decimal"
+)
 
 // Worksheet Defines
 const (
@@ -45,8 +49,8 @@ type XSheetView struct {
 
 // XSheetFormatPr SheetFormatPr node
 type XSheetFormatPr struct {
-	DefaultRowHeight float64 `xml:"defaultRowHeight,attr"`
-	X14acDyDescent   float64 `xml:"x14ac:dyDescent,attr"`
+	DefaultRowHeight decimal.Decimal `xml:"defaultRowHeight,attr"`
+	X14acDyDescent   decimal.Decimal `xml:"x14ac:dyDescent,attr"`
 }
 
 // XSheetData SheetData node
@@ -57,16 +61,16 @@ type XSheetData struct {
 
 // XRow Row node
 type XRow struct {
-	R              int     `xml:"r,attr"` // row number
-	Spans          string  `xml:"spans,attr,omitempty"`
-	Hidden         bool    `xml:"hidden,attr,omitempty"`
-	C              []*XC   `xml:"c"`
-	Ht             string  `xml:"ht,attr,omitempty"`
-	CustomHeight   bool    `xml:"customHeight,attr,omitempty"`
-	OutlineLevel   uint8   `xml:"outlineLevel,attr,omitempty"`
-	S              int     `xml:"s,attr,omitempty"`            // row style id
-	CustomFormat   bool    `xml:"customFormat,attr,omitempty"` // enable row custom format
-	X14acDyDescent float64 `xml:"x14ac:dyDescent,attr"`
+	R              int             `xml:"r,attr"` // row number
+	Spans          string          `xml:"spans,attr,omitempty"`
+	Hidden         bool            `xml:"hidden,attr,omitempty"`
+	C              []*XC           `xml:"c"`
+	Ht             string          `xml:"ht,attr,omitempty"`
+	CustomHeight   bool            `xml:"customHeight,attr,omitempty"`
+	OutlineLevel   uint8           `xml:"outlineLevel,attr,omitempty"`
+	S              int             `xml:"s,attr,omitempty"`            // row style id
+	CustomFormat   bool            `xml:"customFormat,attr,omitempty"` // enable row custom format
+	X14acDyDescent decimal.Decimal `xml:"x14ac:dyDescent,attr"`
 }
 
 // XC This collection represents a cell in the worksheet. Information about the cell's location (reference), value, data type, formatting, and formula is expressed here.
@@ -90,12 +94,12 @@ type XF struct {
 
 // XPageMargins PageMargins node
 type XPageMargins struct {
-	Left   float64 `xml:"left,attr"`
-	Right  float64 `xml:"right,attr"`
-	Top    float64 `xml:"top,attr"`
-	Bottom float64 `xml:"bottom,attr"`
-	Header float64 `xml:"header,attr"`
-	Footer float64 `xml:"footer,attr"`
+	Left   decimal.Decimal `xml:"left,attr"`
+	Right  decimal.Decimal `xml:"right,attr"`
+	Top    decimal.Decimal `xml:"top,attr"`
+	Bottom decimal.Decimal `xml:"bottom,attr"`
+	Header decimal.Decimal `xml:"header,attr"`
+	Footer decimal.Decimal `xml:"footer,attr"`
 }
 
 // XCols Cols node
@@ -105,16 +109,16 @@ type XCols struct {
 
 // XCol Col node
 type XCol struct {
-	Min          int     `xml:"min,attr"`
-	Max          int     `xml:"max,attr"`
-	BestFit      bool    `xml:"bestFit,attr,omitempty"`
-	Collapsed    bool    `xml:"collapsed,attr,omitempty"`
-	CustomWidth  bool    `xml:"customWidth,attr,omitempty"`
-	Hidden       bool    `xml:"hidden,attr,omitempty"`
-	OutlineLevel uint8   `xml:"outlineLevel,attr,omitempty"`
-	Phonetic     bool    `xml:"phonetic,attr,omitempty"`
-	Style        int     `xml:"style,attr,omitempty"`
-	Width        float64 `xml:"width,attr,omitempty"`
+	Min          int             `xml:"min,attr"`
+	Max          int             `xml:"max,attr"`
+	BestFit      bool            `xml:"bestFit,attr,omitempty"`
+	Collapsed    bool            `xml:"collapsed,attr,omitempty"`
+	CustomWidth  bool            `xml:"customWidth,attr,omitempty"`
+	Hidden       bool            `xml:"hidden,attr,omitempty"`
+	OutlineLevel uint8           `xml:"outlineLevel,attr,omitempty"`
+	Phonetic     bool            `xml:"phonetic,attr,omitempty"`
+	Style        int             `xml:"style,attr,omitempty"`
+	Width        decimal.Decimal `xml:"width,attr,omitempty"`
 }
 
 // NewDefaultXWorksheet create *XWorksheet with default template
@@ -135,17 +139,17 @@ func NewDefaultXWorksheet() *XWorksheet {
 			},
 		},
 		SheetFormatPr: &XSheetFormatPr{
-			DefaultRowHeight: 15,
-			X14acDyDescent:   0.25,
+			DefaultRowHeight: decimal.NewFromInt(15),
+			X14acDyDescent:   decimal.NewFromFloat(0.25),
 		},
 		SheetData: &XSheetData{},
 		PageMargins: &XPageMargins{
-			Left:   0.7,
-			Right:  0.7,
-			Top:    0.75,
-			Bottom: 0.75,
-			Header: 0.3,
-			Footer: 0.3,
+			Left:   decimal.NewFromFloat(0.7),
+			Right:  decimal.NewFromFloat(0.7),
+			Top:    decimal.NewFromFloat(0.75),
+			Bottom: decimal.NewFromFloat(0.75),
+			Header: decimal.NewFromFloat(0.3),
+			Footer: decimal.NewFromFloat(0.3),
 		},
 	}
 }

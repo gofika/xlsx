@@ -20,21 +20,22 @@ type Sheet interface {
 	//     sheet.SetAxisCellValue("D4", time.Now()) // D4 => "2021-03-11 05:19"
 	SetAxisCellValue(axis Axis, value any) Cell
 
-	// GetCellString get cell value of string
-	//
-	// Example:
-	//     sheet.GetCellString(1, 1) // A1 => "val"
-	GetCellString(col, row int) string
-
-	// GetCellInt get cell value of string
-	//
-	// Example:
-	//     sheet.GetCellInt(3, 1) // C1 => 1000
-	GetCellInt(col, row int) int
-
 	// Cell get cell by cell col and row
 	Cell(col, row int) Cell
 
 	// AxisCell get cell by cell name
 	AxisCell(axis Axis) Cell
+
+	// SetColumnWidth set column width
+	//
+	// Example:
+	//     sheet.SetColumnWidth("A:B", 20)
+	SetColumnWidth(columnRange string, width int) Sheet
+
+	// GetColumnWidth get column width
+	//
+	// Example:
+	//
+	//	sheet.GetColumnWidth("A") // returns 20
+	GetColumnWidth(columnName string) int
 }

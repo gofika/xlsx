@@ -98,7 +98,7 @@ func main() {
     sheet := doc.OpenSheet("Sheet2")
 
     // read cell string
-    a1String := sheet.GetCellString(1, 1)
+    a1String := sheet.Cell(1, 1).GetStringValue()
     fmt.Println(a1String)
 
     // cell object read
@@ -171,9 +171,9 @@ func main() {
 - [x] File: NewFile, OpenFile, SaveFile, Save, Sheets
 - [x] Sheet:
     - [x] NewSheet, OpenSheet
-    - [x] SetCellValue, GetCellString, GetCellInt, Cell, AxisCell, SetAxisCellValue
+    - [x] SetCellValue, Cell, AxisCell, SetAxisCellValue, SetColumnWidth
 - [x] Cell:
     - [x] Row, Col
     - [x] SetValue, SetIntValue, SetFloatValue, SetFloatValuePrec, SetStringValue, SetBoolValue, SetDefaultValue, SetTimeValue, SetDateValue, SetDurationValue
-    - [x] GetIntValue, GetStringValue
+    - [x] GetIntValue, GetStringValue, GetFloatValue, GetBoolValue, GetTimeValue, GetDurationValue
     - [x] SetNumberFormat

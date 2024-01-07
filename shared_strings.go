@@ -46,7 +46,7 @@ func (s *sharedStrings) Append(str string) (stringID string) {
 	sst.Si = append(sst.Si, &packaging.XSi{
 		T: str,
 		PhoneticPr: &packaging.XPhoneticPr{
-			FontID: "1", // TODO: need ref from styles
+			FontID: "0", // TODO: need ref from styles
 			Type:   "noConversion",
 		},
 	})

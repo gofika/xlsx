@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gofika/xlsx/packaging"
+	"github.com/shopspring/decimal"
 )
 
 // cellImpl cell operator
@@ -59,24 +60,25 @@ func (c *cellImpl) prepareCellFormat() *packaging.XXf {
 // SetValue provides to set the value of a cell
 // Allow Types:
 //
-//	int
-//	int8
-//	int16
-//	int32
-//	int64
-//	uint
-//	uint8
-//	uint16
-//	uint32
-//	uint64
-//	float32
-//	float64
-//	string
-//	[]byte
-//	time.Duration
-//	time.Time
-//	bool
-//	nil
+//		int
+//		int8
+//		int16
+//		int32
+//		int64
+//		uint
+//		uint8
+//		uint16
+//		uint32
+//		uint64
+//	 float32
+//	 float64
+//		decimal.Decimal
+//		string
+//		[]byte
+//		time.Duration
+//		time.Time
+//		bool
+//		nil
 //
 // Example:
 //
@@ -88,8 +90,10 @@ func (c *cellImpl) SetValue(value any) Cell {
 	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
 		c.setIntType(v)
 	case float32:
-		c.SetFloatValuePrec(float64(v), -1, 32)
+		c.SetFloatValue(decimal.NewFromFloat32(v))
 	case float64:
+		c.SetFloatValue(decimal.NewFromFloat(v))
+	case decimal.Decimal:
 		c.SetFloatValue(v)
 	case string:
 		c.SetStringValue(v)
@@ -156,16 +160,35 @@ func (c *cellImpl) GetIntValue() int {
 	return value
 }
 
-// SetFloatValue set cell for float64 type
-func (c *cellImpl) SetFloatValue(value float64) Cell {
-	c.SetFloatValuePrec(value, -1, 64)
+// SetFloatValue set cell for decimal.Decimal type
+func (c *cellImpl) SetFloatValue(value decimal.Decimal) Cell {
+	c.SetFloatValuePrec(value, -1)
 	return c
 }
 
-// SetFloatValuePrec set cell for float64 type with pres
-func (c *cellImpl) SetFloatValuePrec(value float64, prec int, bitSize int) Cell {
+// GetFloatValue get cell value with decimal.Decimal type
+func (c *cellImpl) GetFloatValue() decimal.Decimal {
+	cell := c.getCell()
+	if cell == nil {
+		return decimal.Zero
+	}
+	value, err := decimal.NewFromString(cell.V)
+	// value, err := strconv.ParseFloat(cell.V, 64)
+	if err != nil {
+		return decimal.Zero
+	}
+	return value
+}
+
+// SetFloatValuePrec set cell for decimal.Decimal type with pres
+func (c *cellImpl) SetFloatValuePrec(value decimal.Decimal, prec int) Cell {
 	cell := c.prepareCell()
-	cell.V = strconv.FormatFloat(value, 'f', prec, bitSize)
+	// cell.V = strconv.FormatFloat(value, 'f', prec, bitSize)
+	if prec < 0 {
+		cell.V = value.String()
+	} else {
+		cell.V = value.StringFixed(int32(prec))
+	}
 	return c
 }
 
@@ -199,6 +222,15 @@ func (c *cellImpl) SetBoolValue(value bool) Cell {
 	return c
 }
 
+// GetBoolValue get cell value with bool type
+func (c *cellImpl) GetBoolValue() bool {
+	cell := c.getCell()
+	if cell == nil {
+		return false
+	}
+	return cell.V == "1"
+}
+
 // SetDefaultValue set cell value without any type
 func (c *cellImpl) SetDefaultValue(value string) Cell {
 	cell := c.prepareCell()
@@ -212,15 +244,30 @@ func (c *cellImpl) SetTimeValue(value time.Time) Cell {
 	cell.T = ""
 
 	excelTime := TimeToExcelTime(value)
-	if excelTime > 0 {
-		cell.V = strconv.FormatFloat(excelTime, 'f', 5, 64)
+	if excelTime.GreaterThan(decimal.Zero) {
+		// cell.V = strconv.FormatFloat(excelTime, 'f', 5, 64)
+		cell.V = excelTime.String()
 		cellFormat := c.prepareCellFormat()
 		cellFormat.ApplyNumberFormat = true
-		cellFormat.NumFmtID = 22
+		cellFormat.NumFmtID = 22 // built-in format. 22 = "yyyy-mm-dd hh:mm"
 	} else {
 		cell.V = value.Format(time.RFC3339Nano)
 	}
 	return c
+}
+
+// GetTimeValue get cell value with time.Time type
+func (c *cellImpl) GetTimeValue() time.Time {
+	cell := c.getCell()
+	if cell == nil {
+		return time.Time{}
+	}
+	// excelTime, err := strconv.ParseFloat(cell.V, 64)
+	excelTime, err := decimal.NewFromString(cell.V)
+	if err != nil {
+		return time.Time{}
+	}
+	return ExcelTimeToTime(excelTime)
 }
 
 // SetDateValue set cell value for time.Time type as date format
@@ -229,11 +276,12 @@ func (c *cellImpl) SetDateValue(value time.Time) Cell {
 	cell.T = ""
 
 	excelTime := TimeToExcelTime(value)
-	if excelTime > 0 {
-		cell.V = strconv.FormatFloat(excelTime, 'f', 5, 64)
+	if excelTime.GreaterThan(decimal.Zero) {
+		// cell.V = strconv.FormatFloat(excelTime, 'f', 5, 64)
+		cell.V = excelTime.String()
 		cellFormat := c.prepareCellFormat()
 		cellFormat.ApplyNumberFormat = true
-		cellFormat.NumFmtID = 34
+		cellFormat.NumFmtID = 34 // built-in format. 34 = "yyyy-mm-dd"
 	} else {
 		cell.V = value.Format(time.RFC3339Nano)
 	}
@@ -243,11 +291,26 @@ func (c *cellImpl) SetDateValue(value time.Time) Cell {
 // SetDurationValue set cell value for time.Duration type
 func (c *cellImpl) SetDurationValue(value time.Duration) Cell {
 	cell := c.prepareCell()
-	cell.V = strconv.FormatFloat(value.Seconds()/86400.0, 'f', 5, 32)
+	cell.V = strconv.FormatFloat(value.Seconds()/86400.0, 'f', 5, 64)
 	cellFormat := c.prepareCellFormat()
 	cellFormat.ApplyNumberFormat = true
-	cellFormat.NumFmtID = 21
+	cellFormat.NumFmtID = 21 // built-in format. 21 = "h:mm:ss"
 	return c
+}
+
+// GetDurationValue get cell value with time.Duration type
+func (c *cellImpl) GetDurationValue() time.Duration {
+	cell := c.getCell()
+	if cell == nil {
+		return 0
+	}
+	// excelTime, err := strconv.ParseFloat(cell.V, 64)
+	excelTime, err := decimal.NewFromString(cell.V)
+	if err != nil {
+		return 0
+	}
+	// return time.Duration(excelTime * 86400.0 * time.Second)
+	return time.Duration(excelTime.Mul(decimal.NewFromFloat(86400.0)).IntPart()) * time.Second
 }
 
 // SetNumberFormat set cell number format with format code
