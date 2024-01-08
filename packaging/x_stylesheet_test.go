@@ -15,8 +15,8 @@ const defaultStyleSheetTemplate = `<?xml version="1.0" encoding="UTF-8" standalo
             <sz val="11"></sz>
             <color theme="1"></color>
             <name val="Microsoft YaHei"></name>
-            <family val="2"></family>
-            <scheme val="minor"></scheme>
+            <family val="0"></family>
+            <charset val="0"></charset>
         </font>
     </fonts>
     <fills count="2">
