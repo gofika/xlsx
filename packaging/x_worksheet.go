@@ -28,6 +28,7 @@ type XWorksheet struct {
 	SheetFormatPr *XSheetFormatPr `xml:"sheetFormatPr"`
 	Cols          *XCols          `xml:"cols,omitempty"`
 	SheetData     *XSheetData     `xml:"sheetData"`
+	MergeCells    *XMergeCells    `xml:"mergeCells,omitempty"`
 	PageMargins   *XPageMargins   `xml:"pageMargins"`
 }
 
@@ -119,6 +120,17 @@ type XCol struct {
 	Phonetic     bool            `xml:"phonetic,attr,omitempty"`
 	Style        int             `xml:"style,attr,omitempty"`
 	Width        decimal.Decimal `xml:"width,attr,omitempty"`
+}
+
+// XMergeCells MergeCells node
+type XMergeCells struct {
+	Count     int           `xml:"count,attr,omitempty"`
+	MergeCell []*XMergeCell `xml:"mergeCell,omitempty"`
+}
+
+// XMergeCell MergeCell node
+type XMergeCell struct {
+	Ref string `xml:"ref,attr,omitempty"`
 }
 
 // NewDefaultXWorksheet create *XWorksheet with default template

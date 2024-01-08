@@ -24,7 +24,7 @@ func TestNewSheet(t *testing.T) {
 
 func TestSetCellValue(t *testing.T) {
 	const docPath = "test_docs/set_cell_values.xlsx"
-	f := NewFile()
+	f := NewFile(WithDefaultFontSize(9))
 
 	sheet := f.OpenSheet("Sheet1")
 
@@ -43,6 +43,8 @@ func TestSetCellValue(t *testing.T) {
 	assert.True(t, sheet.Cell(valueCol, valueRow).GetFloatValue().Equal(decimal.NewFromInt(100)))
 
 	timeVal := time.Date(1980, 9, 8, 23, 40, 10, 40, time.UTC)
+	// merge cell
+	sheet.MergeCell("D3", "E3")
 	// SetAxisCellValue example
 	sheet.SetAxisCellValue("C3", 200.50)
 	sheet.SetAxisCellValue("D3", timeVal)
@@ -55,6 +57,7 @@ func TestSetCellValue(t *testing.T) {
 		SetTimeValue(timeVal).
 		SetNumberFormat("yyyy-mm-dd hh:mm:ss")
 	sheet.SetColumnWidth("D:D", 20)
+
 	err := f.SaveFile(docPath)
 	assert.Nil(t, err)
 }

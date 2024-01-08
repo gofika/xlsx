@@ -45,7 +45,6 @@ func (c *cellImpl) getCell() *packaging.XC {
 }
 
 func (c *cellImpl) getSharedStrings() *sharedStrings {
-	// return newSharedStrings(c.sheet.file)
 	return c.sheet.file.ss
 }
 
@@ -57,34 +56,6 @@ func (c *cellImpl) prepareCellFormat() *packaging.XXf {
 	return c.sheet.prepareCellFormat(c.col, c.row)
 }
 
-// SetValue provides to set the value of a cell
-// Allow Types:
-//
-//		int
-//		int8
-//		int16
-//		int32
-//		int64
-//		uint
-//		uint8
-//		uint16
-//		uint32
-//		uint64
-//	 float32
-//	 float64
-//		decimal.Decimal
-//		string
-//		[]byte
-//		time.Duration
-//		time.Time
-//		bool
-//		nil
-//
-// Example:
-//
-//	cell.SetValue(100)
-//	cell.SetValue("Hello")
-//	cell.SetValue(3.14)
 func (c *cellImpl) SetValue(value any) Cell {
 	switch v := value.(type) {
 	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
@@ -105,8 +76,6 @@ func (c *cellImpl) SetValue(value any) Cell {
 		c.SetTimeValue(v)
 	case bool:
 		c.SetBoolValue(v)
-	case nil:
-		c.SetDefaultValue("")
 	default:
 		c.SetStringValue(fmt.Sprint(value))
 	}

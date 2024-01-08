@@ -34,6 +34,11 @@ func (s *sheetImpl) getStyleSheet() *packaging.XStyleSheet {
 	return s.file.xFile.StyleSheet
 }
 
+// Name get sheet name
+func (s *sheetImpl) Name() string {
+	return s.sheet.Name
+}
+
 // SetCellValue set cell value
 //
 // Example:
@@ -279,4 +284,61 @@ func (s *sheetImpl) GetColumnWidth(columnName string) int {
 		}
 	}
 	return 0
+}
+
+// MergeCell merge cell
+//
+// Example:
+//
+//	sheet.MergeCell("A1", "B1")
+func (s *sheetImpl) MergeCell(start Axis, end Axis) Sheet {
+	startCol, startRow := start.C()
+	endCol, endRow := end.C()
+	if startCol == endCol && startRow == endRow {
+		return s
+	}
+	// convert B1:A2 to A1:B2
+	if endCol < startCol {
+		startCol, endCol = endCol, startCol
+	}
+	if endRow < startRow {
+		startRow, endRow = endRow, startRow
+	}
+	sheetData := s.getSheetData()
+	// remove cell
+	for row := startRow; row <= endRow; row++ {
+		for col := startCol; col <= endCol; col++ {
+			cell := s.getCell(col, row)
+			if cell != nil {
+				for i, c := range sheetData.Row[row-1].C {
+					if c.R == cell.R {
+						sheetData.Row[row-1].C = append(sheetData.Row[row-1].C[:i], sheetData.Row[row-1].C[i+1:]...)
+						break
+					}
+				}
+			}
+		}
+	}
+	// merge cell
+	startCellName := CoordinatesToCellName(startCol, startRow)
+	endCellName := CoordinatesToCellName(endCol, endRow)
+	mergeCell := &packaging.XMergeCell{
+		Ref: fmt.Sprintf("%s:%s", startCellName, endCellName),
+	}
+	worksheet := s.getWorksheet()
+	if worksheet.MergeCells == nil {
+		worksheet.MergeCells = &packaging.XMergeCells{
+			Count:     0,
+			MergeCell: []*packaging.XMergeCell{},
+		}
+	}
+	// check merge cell exist
+	for _, mc := range worksheet.MergeCells.MergeCell {
+		if mc.Ref == mergeCell.Ref {
+			return s
+		}
+	}
+	worksheet.MergeCells.MergeCell = append(worksheet.MergeCells.MergeCell, mergeCell)
+	worksheet.MergeCells.Count = len(worksheet.MergeCells.MergeCell)
+	return s
 }

@@ -28,13 +28,12 @@ type Cell interface {
 	//     uint64
 	//     float32
 	//     float64
-	//     decimal.Decimal
 	//     string
-	//     []byte
-	//     time.Duration
-	//     time.Time
 	//     bool
-	//     nil
+	//     time.Time
+	//     time.Duration
+	//     []byte
+	//     decimal.Decimal
 	//
 	// Example:
 	//     cell.SetValue(100)

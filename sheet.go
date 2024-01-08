@@ -2,6 +2,9 @@ package xlsx
 
 // Sheet sheet operator
 type Sheet interface {
+	// Name sheet name
+	Name() string
+
 	// SetCellValue set cell value
 	//
 	// Example:
@@ -35,7 +38,12 @@ type Sheet interface {
 	// GetColumnWidth get column width
 	//
 	// Example:
-	//
 	//	sheet.GetColumnWidth("A") // returns 20
 	GetColumnWidth(columnName string) int
+
+	// MergeCell merge cell
+	//
+	// Example:
+	//     sheet.MergeCell("A1", "B1")
+	MergeCell(start Axis, end Axis) Sheet
 }
