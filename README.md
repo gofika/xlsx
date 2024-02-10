@@ -46,7 +46,7 @@ func main() {
     sheet := doc.OpenSheet("Sheet1")
 
     // write values
-	valueCol := ColumnNumber("B")
+    valueCol := ColumnNumber("B")
     sheet.SetCellValue(xlsx.ColumnNumber("A"), 1, "Name") // A1 = Name
     sheet.SetCellValue(xlsx.ColumnNumber("A"), 2, "Jason") // A2 = Json
     sheet.SetCellValue(xlsx.ColumnNumber("B"), 1, "Score") // B1 = Score
@@ -54,18 +54,18 @@ func main() {
     // get cell style
     style := sheet.GetAxisCellStyle("A1")
     // set border style
-	style.Border.BottomBorder = xlsx.BorderStyleThin
-	style.Border.BottomBorderColor = xlsx.Color{
-		Color: "FF0000",
-	}
-	// set cell alignment
-	style.Alignment.Horizontal = xlsx.HorizontalAlignmentCenter
-	style.Alignment.Vertical = xlsx.VerticalAlignmentCenter
-	// set font style
-	style.Font.Bold = true
+    style.Border.BottomBorder = xlsx.BorderStyleThin
+    style.Border.BottomBorderColor = xlsx.Color{
+        Color: "FF0000",
+    }
+    // set cell alignment
+    style.Alignment.Horizontal = xlsx.HorizontalAlignmentCenter
+    style.Alignment.Vertical = xlsx.VerticalAlignmentCenter
+    // set font style
+    style.Font.Bold = true
     // set cell style
-	sheet.SetAxisCellStyle("A1", style)
-	sheet.SetAxisCellStyle("B1", style)
+    sheet.SetAxisCellStyle("A1", style)
+    sheet.SetAxisCellStyle("B1", style)
 
     // time value
     sheet.SetAxisCellValue("C1", "Date") // C1 = Date
@@ -81,13 +81,13 @@ func main() {
         SetTimeValue(time.Now()).
         SetNumberFormat("yyyy-mm-dd hh:mm:ss") // D2 = 2022-08-23 20:08:08 (your current time)
 
-	// set formula
-	sheet.AxisCell("F1").SetIntValue(100)
-	sheet.AxisCell("F2").SetIntValue(200)
-	sheet.AxisCell("F3").SetFormula("SUM(F1:F2)")
+    // set formula
+    sheet.AxisCell("F1").SetIntValue(100)
+    sheet.AxisCell("F2").SetIntValue(200)
+    sheet.AxisCell("F3").SetFormula("SUM(F1:F2)")
 
     // set cell border
-	sheet.SetAxisCellBorder("F3", xlsx.BorderStyleThin, xlsx.Color{Color: "0000FF"}, true, true, true, true)
+    sheet.SetAxisCellBorder("F3", xlsx.BorderStyleThin, xlsx.Color{Color: "0000FF"}, true, true, true, true)
 
     // save to file
     if err := doc.SaveFile("Document1.xlsx"); err != nil {
