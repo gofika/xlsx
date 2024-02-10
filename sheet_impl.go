@@ -182,40 +182,287 @@ func (s *sheetImpl) removeRow(row int) {
 func (s *sheetImpl) getCellFormat(col, row int) *packaging.XXf {
 	cell := s.getCell(col, row)
 	if cell == nil {
-		return nil
+		return s.getDefaultCellFormat()
 	}
 	styleSheet := s.getStyleSheet()
 	if cell.S < len(styleSheet.CellXfs.Xf) {
 		return styleSheet.CellXfs.Xf[cell.S]
 	}
+	return s.getDefaultCellFormat()
+}
+
+func (s *sheetImpl) getDefaultCellFormat() *packaging.XXf {
+	styleSheet := s.getStyleSheet()
+	return styleSheet.CellXfs.Xf[0]
+}
+
+func (s *sheetImpl) getCellFont(col, row int) *packaging.XStyleSheetFont {
+	cellFormat := s.getCellFormat(col, row)
+	if cellFormat != nil {
+		styleSheet := s.getStyleSheet()
+		if cellFormat.FontID < len(styleSheet.Fonts.Font) {
+			return styleSheet.Fonts.Font[cellFormat.FontID]
+		}
+	}
+	return s.getDefaultFont()
+}
+
+func (s *sheetImpl) getDefaultFont() *packaging.XStyleSheetFont {
+	styleSheet := s.getStyleSheet()
+	return styleSheet.Fonts.Font[0]
+}
+
+func (s *sheetImpl) getCellAlignment(col, row int) *packaging.XAlignment {
+	cellFormat := s.getCellFormat(col, row)
+	return cellFormat.Alignment
+}
+
+func (s *sheetImpl) getCellBorder(col, row int) *packaging.XBorder {
+	cellFormat := s.getCellFormat(col, row)
+	styleSheet := s.getStyleSheet()
+	if cellFormat.BorderID < len(styleSheet.Borders.Border) {
+		return styleSheet.Borders.Border[cellFormat.BorderID]
+	}
+	return s.getDefaultBorder()
+}
+
+func (s *sheetImpl) getDefaultBorder() *packaging.XBorder {
+	styleSheet := s.getStyleSheet()
+	return styleSheet.Borders.Border[0]
+}
+
+func (s *sheetImpl) getCellFill(col, row int) *packaging.XFill {
+	cellFormat := s.getCellFormat(col, row)
+	styleSheet := s.getStyleSheet()
+	if cellFormat.FillID < len(styleSheet.Fills.Fill) {
+		return styleSheet.Fills.Fill[cellFormat.FillID]
+	}
+	return s.getDefaultFill()
+}
+
+func (s *sheetImpl) getDefaultFill() *packaging.XFill {
+	styleSheet := s.getStyleSheet()
+	return styleSheet.Fills.Fill[0]
+}
+
+// func (s *sheetImpl) prepareCellFormat(col, row int) *packaging.XXf {
+// 	cell := s.prepareCell(col, row)
+// 	var cellFormat *packaging.XXf
+// 	if cell.S > 0 { // 0=default cant modify
+// 		cellFormat = s.getCellFormat(col, row)
+// 		return cellFormat
+// 	}
+// 	// create new xf
+// 	cellFormat = &packaging.XXf{
+// 		NumFmtID: 0,
+// 		FontID:   0,
+// 		FillID:   0,
+// 		BorderID: 0,
+// 		XfID:     0,
+// 	}
+// 	styleSheet := s.getStyleSheet()
+// 	styleSheet.CellXfs.Xf = append(styleSheet.CellXfs.Xf, cellFormat)
+// 	styleSheet.CellXfs.Count = len(styleSheet.CellXfs.Xf)
+// 	cell.S = styleSheet.CellXfs.Count - 1
+// 	return cellFormat
+// }
+
+func (s *sheetImpl) GetCellStyle(col, row int) Style {
+	cellFormat := s.getCellFormat(col, row)
+	var style Style
+	// Font
+	style.Font = fontFromPackaing(s.getCellFont(col, row))
+
+	// Alignment
+	style.Alignment = alignmentFromPackaging(s.getCellAlignment(col, row))
+
+	// Border
+	style.Border = borderFromPackaging(s.getCellBorder(col, row))
+
+	// Fill
+	style.Fill = fillFromPackaging(s.getCellFill(col, row))
+
+	// IncludeQuotePrefix
+	style.IncludeQuotePrefix = cellFormat.QuotePrefix.Value()
+
+	// NumberFormat
+	style.NumberFormat = numberFormatFromPackaging(s.findNumFmt(cellFormat.NumFmtID))
+	return style
+}
+
+func (s *sheetImpl) GetAxisCellStyle(axis Axis) Style {
+	return s.GetCellStyle(axis.C())
+}
+
+func (s *sheetImpl) SetCellStyle(col, row int, style Style) Sheet {
+	styleSheet := s.getStyleSheet()
+	var format packaging.XXf
+	// Font
+	fontID := -1
+	font := packaingToFont(style.Font)
+	for i, f := range styleSheet.Fonts.Font {
+		if font.Equal(f) {
+			fontID = i
+			break
+		}
+	}
+	if fontID == -1 {
+		fontID = len(styleSheet.Fonts.Font)
+		styleSheet.Fonts.Font = append(styleSheet.Fonts.Font, font)
+		styleSheet.Fonts.Count = len(styleSheet.Fonts.Font)
+	}
+	format.FontID = fontID
+	format.ApplyFont = packaging.NewBool(fontID > 0)
+
+	// Alignment
+	alignment := packaingToAlignment(style.Alignment)
+	if !alignment.IsZero() {
+		format.Alignment = alignment
+	}
+	format.ApplyAlignment = packaging.NewBool(!alignment.IsZero())
+
+	// Border
+	border := packaingToBorder(style.Border)
+	borderID := -1
+	for i, b := range styleSheet.Borders.Border {
+		if border.Equal(b) {
+			borderID = i
+			break
+		}
+	}
+	if borderID == -1 {
+		borderID = len(styleSheet.Borders.Border)
+		styleSheet.Borders.Border = append(styleSheet.Borders.Border, border)
+		styleSheet.Borders.Count = len(styleSheet.Borders.Border)
+	}
+	format.BorderID = borderID
+	format.ApplyBorder = packaging.NewBool(borderID > 0)
+
+	// Fill
+	fill := packaingToFill(style.Fill)
+	fillID := -1
+	for i, f := range styleSheet.Fills.Fill {
+		if fill.Equal(f) {
+			fillID = i
+			break
+		}
+	}
+	if fillID == -1 {
+		fillID = len(styleSheet.Fills.Fill)
+		styleSheet.Fills.Fill = append(styleSheet.Fills.Fill, fill)
+		styleSheet.Fills.Count = len(styleSheet.Fills.Fill)
+	}
+	format.FillID = fillID
+	format.ApplyFill = packaging.NewBool(fillID > 0)
+
+	// IncludeQuotePrefix
+	format.QuotePrefix = packaging.NewBool(style.IncludeQuotePrefix)
+
+	// NumberFormat
+	numFmt := packaingToNumberFormat(style.NumberFormat)
+	numFmtID := -1
+	if numFmt.NumFmtID > 0 && numFmt.NumFmtID < BuiltInNumFmtMax {
+		// built-in format
+		numFmtID = numFmt.NumFmtID
+	} else {
+		if numFmt.NumFmtID == 0 && numFmt.FormatCode != "" {
+			for i, formatCode := range builtInNumFmt {
+				if numFmt.FormatCode == formatCode {
+					numFmtID = i
+					break
+				}
+			}
+			if numFmtID == -1 {
+				// custom format
+				for i, nf := range styleSheet.NumFmts.NumFmt {
+					if numFmt.FormatCode == nf.FormatCode {
+						numFmtID = i
+						break
+					}
+				}
+			}
+		} else {
+			for i, nf := range styleSheet.NumFmts.NumFmt {
+				if numFmt.Equal(nf) {
+					numFmtID = i
+					break
+				}
+			}
+		}
+	}
+	if numFmtID == -1 {
+		if numFmt.FormatCode != "" {
+			numFmtID = len(styleSheet.NumFmts.NumFmt) + BuiltInNumFmtMax + 1
+			numFmt.NumFmtID = numFmtID
+			styleSheet.NumFmts.NumFmt = append(styleSheet.NumFmts.NumFmt, numFmt)
+			styleSheet.NumFmts.Count = len(styleSheet.NumFmts.NumFmt)
+		} else {
+			numFmtID = 0
+		}
+	}
+	format.NumFmtID = numFmtID
+	format.ApplyNumberFormat = packaging.NewBool(numFmtID > 0)
+
+	// set cell format
+	formatID := -1
+	for i, f := range styleSheet.CellXfs.Xf {
+		if f.Equal(&format) {
+			formatID = i
+			break
+		}
+	}
+	cell := s.prepareCell(col, row)
+	if formatID == -1 {
+		formatID = len(styleSheet.CellXfs.Xf)
+		styleSheet.CellXfs.Xf = append(styleSheet.CellXfs.Xf, &format)
+		styleSheet.CellXfs.Count = len(styleSheet.CellXfs.Xf)
+	}
+	cell.S = formatID
+	return s
+}
+
+func (s *sheetImpl) SetAxisCellStyle(axis Axis, style Style) Sheet {
+	col, row := axis.C()
+	return s.SetCellStyle(col, row, style)
+}
+
+func (s *sheetImpl) findNumFmt(numFmtID int) (numFmt *packaging.XNumFmt) {
+	numFmts := s.prepareNumFmts()
+	for _, nf := range numFmts.NumFmt {
+		if nf.NumFmtID == numFmtID {
+			return nf
+		}
+	}
+	nf, ok := builtInNumFmt[numFmtID]
+	if ok {
+		return &packaging.XNumFmt{
+			FormatCode: nf,
+			NumFmtID:   numFmtID,
+		}
+	}
 	return nil
 }
 
-func (s *sheetImpl) prepareCellFormat(col, row int) *packaging.XXf {
-	cell := s.prepareCell(col, row)
-	var cellFormat *packaging.XXf
-	if cell.S > 0 { // 0=default cant modify
-		cellFormat = s.getCellFormat(col, row)
-		if cellFormat != nil {
-			return cellFormat
+func (s *sheetImpl) findNumFmtCode(formatCode string) (numFmt *packaging.XNumFmt) {
+	numFmts := s.prepareNumFmts()
+	for _, nf := range numFmts.NumFmt {
+		if nf.FormatCode == formatCode {
+			return nf
 		}
 	}
-	// create new xf
-	cellFormat = &packaging.XXf{
-		NumFmtID: 0,
-		FontID:   0,
-		FillID:   0,
-		BorderID: 0,
-		XfID:     0,
+	// try find built in format
+	for i, nf := range builtInNumFmt {
+		if nf == formatCode {
+			return &packaging.XNumFmt{
+				FormatCode: formatCode,
+				NumFmtID:   i,
+			}
+		}
 	}
-	styleSheet := s.getStyleSheet()
-	styleSheet.CellXfs.Xf = append(styleSheet.CellXfs.Xf, cellFormat)
-	styleSheet.CellXfs.Count = len(styleSheet.CellXfs.Xf)
-	cell.S = styleSheet.CellXfs.Count - 1
-	return cellFormat
+	return nil
 }
 
-func (s *sheetImpl) prepareNumberingFormat(formatCode string) (numFmtID int) {
+func (s *sheetImpl) prepareNumFmts() *packaging.XNumFmts {
 	styleSheet := s.getStyleSheet()
 	if styleSheet.NumFmts == nil {
 		styleSheet.NumFmts = &packaging.XNumFmts{
@@ -223,19 +470,7 @@ func (s *sheetImpl) prepareNumberingFormat(formatCode string) (numFmtID int) {
 			NumFmt: []*packaging.XNumFmt{},
 		}
 	}
-	for _, numFmt := range styleSheet.NumFmts.NumFmt {
-		if numFmt.FormatCode == formatCode {
-			return numFmt.NumFmtId
-		}
-	}
-	// create new numFmt
-	numFmt := &packaging.XNumFmt{
-		FormatCode: formatCode,
-		NumFmtId:   1000 + len(styleSheet.NumFmts.NumFmt),
-	}
-	styleSheet.NumFmts.NumFmt = append(styleSheet.NumFmts.NumFmt, numFmt)
-	styleSheet.NumFmts.Count = len(styleSheet.NumFmts.NumFmt)
-	return numFmt.NumFmtId
+	return styleSheet.NumFmts
 }
 
 // SetColumnWidth set column width
@@ -341,4 +576,43 @@ func (s *sheetImpl) MergeCell(start Axis, end Axis) Sheet {
 	worksheet.MergeCells.MergeCell = append(worksheet.MergeCells.MergeCell, mergeCell)
 	worksheet.MergeCells.Count = len(worksheet.MergeCells.MergeCell)
 	return s
+}
+
+func (s *sheetImpl) SetCellBorder(col, row int, borderStyle BorderStyle, borderColor Color, top, right, bottom, left bool) Sheet {
+	style := s.GetCellStyle(col, row)
+	backgroundColor := style.Fill.BackgroundColor
+	if backgroundColor.IsZero() {
+		backgroundColor = Color{Color: "FFFFFFFF"}
+	}
+	style.Border.TopBorder = borderStyle
+	if top {
+		style.Border.TopBorderColor = borderColor
+	} else {
+		style.Border.TopBorderColor = backgroundColor
+	}
+	style.Border.BottomBorder = borderStyle
+	if bottom {
+		style.Border.BottomBorderColor = borderColor
+	} else {
+		style.Border.BottomBorderColor = backgroundColor
+	}
+	style.Border.LeftBorder = borderStyle
+	if left {
+		style.Border.LeftBorderColor = borderColor
+	} else {
+		style.Border.LeftBorderColor = backgroundColor
+	}
+	style.Border.RightBorder = borderStyle
+	if right {
+		style.Border.RightBorderColor = borderColor
+	} else {
+		style.Border.RightBorderColor = backgroundColor
+	}
+	s.SetCellStyle(col, row, style)
+	return s
+}
+
+func (s *sheetImpl) SetAxisCellBorder(axis Axis, borderStyle BorderStyle, borderColor Color, top, right, bottom, left bool) Sheet {
+	col, row := axis.C()
+	return s.SetCellBorder(col, row, borderStyle, borderColor, top, right, bottom, left)
 }

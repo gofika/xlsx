@@ -12,11 +12,11 @@ const defaultStyleSheetTemplate = `<?xml version="1.0" encoding="UTF-8" standalo
 <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="x14ac x16r2" xmlns:x14ac="http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac" xmlns:x16r2="http://schemas.microsoft.com/office/spreadsheetml/2015/02/main">
     <fonts count="1" x14ac:knownFonts="1">
         <font>
-            <sz val="11"></sz>
-            <color theme="1"></color>
-            <name val="Microsoft YaHei"></name>
-            <family val="0"></family>
             <charset val="0"></charset>
+            <color theme="1"></color>
+            <family val="0"></family>
+            <name val="Microsoft YaHei"></name>
+            <sz val="11"></sz>
         </font>
     </fonts>
     <fills count="2">
@@ -37,10 +37,10 @@ const defaultStyleSheetTemplate = `<?xml version="1.0" encoding="UTF-8" standalo
         </border>
     </borders>
     <cellStyleXfs count="1">
-        <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"></xf>
+        <xf numFmtId="0" fontId="0" fillId="0" borderId="0"></xf>
     </cellStyleXfs>
     <cellXfs count="1">
-        <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"></xf>
+        <xf numFmtId="0" fontId="0" fillId="0" borderId="0"></xf>
     </cellXfs>
     <cellStyles count="1">
         <cellStyle name="Normal" xfId="0" builtinId="0"></cellStyle>

@@ -46,4 +46,28 @@ type Sheet interface {
 	// Example:
 	//     sheet.MergeCell("A1", "B1")
 	MergeCell(start Axis, end Axis) Sheet
+
+	// GetCellStyle get cell style
+	GetCellStyle(col, row int) Style
+
+	// GetAxisCellStyle get cell style
+	GetAxisCellStyle(axis Axis) Style
+
+	// SetCellStyle set cell style
+	SetCellStyle(col, row int, style Style) Sheet
+
+	// SetAxisCellStyle set cell style
+	SetAxisCellStyle(axis Axis, style Style) Sheet
+
+	// SetCellBorder set cell border
+	//
+	// Example:
+	//     sheet.SetCellBorder(1, 1, BorderStyleThin, Color{Color: "FF0000"}, false, true, false, true)
+	SetCellBorder(col, row int, borderStyle BorderStyle, borderColor Color, top, right, bottom, left bool) Sheet
+
+	// SetAxisCellBorder set cell border
+	//
+	// Example:
+	//     sheet.SetAxisCellBorder("A1", BorderStyleThin, Color{Color: "FF0000"}, false, true, false, true)
+	SetAxisCellBorder(axis Axis, borderStyle BorderStyle, borderColor Color, top, right, bottom, left bool) Sheet
 }

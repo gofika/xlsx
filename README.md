@@ -51,6 +51,21 @@ func main() {
     sheet.SetCellValue(xlsx.ColumnNumber("A"), 2, "Jason") // A2 = Json
     sheet.SetCellValue(xlsx.ColumnNumber("B"), 1, "Score") // B1 = Score
     sheet.SetCellValue(xlsx.ColumnNumber("B"), 2, 100) // B2 = 100
+    // get cell style
+    style := sheet.GetAxisCellStyle("A1")
+    // set border style
+	style.Border.BottomBorder = xlsx.BorderStyleThin
+	style.Border.BottomBorderColor = xlsx.Color{
+		Color: "FF0000",
+	}
+	// set cell alignment
+	style.Alignment.Horizontal = xlsx.HorizontalAlignmentCenter
+	style.Alignment.Vertical = xlsx.VerticalAlignmentCenter
+	// set font style
+	style.Font.Bold = true
+    // set cell style
+	sheet.SetAxisCellStyle("A1", style)
+	sheet.SetAxisCellStyle("B1", style)
 
     // time value
     sheet.SetAxisCellValue("C1", "Date") // C1 = Date
@@ -65,6 +80,14 @@ func main() {
     sheet.AxisCell("E2").
         SetTimeValue(time.Now()).
         SetNumberFormat("yyyy-mm-dd hh:mm:ss") // D2 = 2022-08-23 20:08:08 (your current time)
+
+	// set formula
+	sheet.AxisCell("F1").SetIntValue(100)
+	sheet.AxisCell("F2").SetIntValue(200)
+	sheet.AxisCell("F3").SetFormula("SUM(F1:F2)")
+
+    // set cell border
+	sheet.SetAxisCellBorder("F3", xlsx.BorderStyleThin, xlsx.Color{Color: "0000FF"}, true, true, true, true)
 
     // save to file
     if err := doc.SaveFile("Document1.xlsx"); err != nil {
@@ -165,7 +188,7 @@ func main() {
 
 
 
-## TODO:
+## Implemented:
 
 - [x] Basic File Format
 - [x] File: NewFile, OpenFile, SaveFile, Save, Sheets
@@ -174,6 +197,6 @@ func main() {
     - [x] Name, SetCellValue, Cell, AxisCell, SetAxisCellValue, SetColumnWidth, GetColumnWidth, MergeCell
 - [x] Cell:
     - [x] Row, Col
-    - [x] SetValue, SetIntValue, SetFloatValue, SetFloatValuePrec, SetStringValue, SetBoolValue, SetDefaultValue, SetTimeValue, SetDateValue, SetDurationValue
-    - [x] GetIntValue, GetStringValue, GetFloatValue, GetBoolValue, GetTimeValue, GetDurationValue
+    - [x] SetValue, SetIntValue, SetFloatValue, SetFloatValuePrec, SetStringValue, SetBoolValue, SetDefaultValue, SetTimeValue, SetDateValue, SetDurationValue, SetStyle, SetCellBorder, SetFormula
+    - [x] GetIntValue, GetStringValue, GetFloatValue, GetBoolValue, GetTimeValue, GetDurationValue, GetStyle, GetFormula
     - [x] SetNumberFormat

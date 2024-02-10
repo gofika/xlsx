@@ -36,6 +36,11 @@ func (c *cellImpl) Col() int {
 	return c.col
 }
 
+// Axis cell axis
+func (c *cellImpl) Axis() Axis {
+	return Axis(c.cellName)
+}
+
 func (c *cellImpl) getRow() *packaging.XRow {
 	return c.sheet.getRow(c.row)
 }
@@ -52,8 +57,17 @@ func (c *cellImpl) prepareCell() *packaging.XC {
 	return c.sheet.prepareCell(c.col, c.row)
 }
 
-func (c *cellImpl) prepareCellFormat() *packaging.XXf {
-	return c.sheet.prepareCellFormat(c.col, c.row)
+// func (c *cellImpl) prepareCellFormat() *packaging.XXf {
+// 	return c.sheet.prepareCellFormat(c.col, c.row)
+// }
+
+func (c *cellImpl) GetStyle() Style {
+	return c.sheet.GetCellStyle(c.col, c.row)
+}
+
+func (c *cellImpl) SetStyle(style Style) Cell {
+	c.sheet.SetCellStyle(c.col, c.row, style)
+	return c
 }
 
 func (c *cellImpl) SetValue(value any) Cell {
@@ -216,9 +230,13 @@ func (c *cellImpl) SetTimeValue(value time.Time) Cell {
 	if excelTime.GreaterThan(decimal.Zero) {
 		// cell.V = strconv.FormatFloat(excelTime, 'f', 5, 64)
 		cell.V = excelTime.String()
-		cellFormat := c.prepareCellFormat()
-		cellFormat.ApplyNumberFormat = true
-		cellFormat.NumFmtID = 22 // built-in format. 22 = "yyyy-mm-dd hh:mm"
+		// cellFormat := c.prepareCellFormat()
+		// cellFormat.ApplyNumberFormat = true
+		// cellFormat.NumFmtID = 22 // built-in format. 22 = "yyyy-mm-dd hh:mm"
+
+		style := c.GetStyle()
+		style.NumberFormat.NumberFormatID = 22 // built-in format. 22 = "yyyy-mm-dd hh:mm"
+		c.SetStyle(style)
 	} else {
 		cell.V = value.Format(time.RFC3339Nano)
 	}
@@ -248,9 +266,12 @@ func (c *cellImpl) SetDateValue(value time.Time) Cell {
 	if excelTime.GreaterThan(decimal.Zero) {
 		// cell.V = strconv.FormatFloat(excelTime, 'f', 5, 64)
 		cell.V = excelTime.String()
-		cellFormat := c.prepareCellFormat()
-		cellFormat.ApplyNumberFormat = true
-		cellFormat.NumFmtID = 34 // built-in format. 34 = "yyyy-mm-dd"
+		// cellFormat := c.prepareCellFormat()
+		// cellFormat.ApplyNumberFormat = true
+		// cellFormat.NumFmtID = 34 // built-in format. 34 = "yyyy-mm-dd"
+		style := c.GetStyle()
+		style.NumberFormat.NumberFormatID = 34 // built-in format. 34 = "yyyy-mm-dd"
+		c.SetStyle(style)
 	} else {
 		cell.V = value.Format(time.RFC3339Nano)
 	}
@@ -261,9 +282,12 @@ func (c *cellImpl) SetDateValue(value time.Time) Cell {
 func (c *cellImpl) SetDurationValue(value time.Duration) Cell {
 	cell := c.prepareCell()
 	cell.V = strconv.FormatFloat(value.Seconds()/86400.0, 'f', 5, 64)
-	cellFormat := c.prepareCellFormat()
-	cellFormat.ApplyNumberFormat = true
-	cellFormat.NumFmtID = 21 // built-in format. 21 = "h:mm:ss"
+	// cellFormat := c.prepareCellFormat()
+	// cellFormat.ApplyNumberFormat = true
+	// cellFormat.NumFmtID = 21 // built-in format. 21 = "h:mm:ss"
+	style := c.GetStyle()
+	style.NumberFormat.NumberFormatID = 21 // built-in format. 21 = "h:mm:ss"
+	c.SetStyle(style)
 	return c
 }
 
@@ -282,12 +306,39 @@ func (c *cellImpl) GetDurationValue() time.Duration {
 	return time.Duration(excelTime.Mul(decimal.NewFromFloat(86400.0)).IntPart()) * time.Second
 }
 
+// SetFormula set cell formula
+func (c *cellImpl) SetFormula(formula string) Cell {
+	cell := c.prepareCell()
+	cell.F = &packaging.XF{
+		Content: formula,
+	}
+	return c
+}
+
+// GetFormula get cell formula
+func (c *cellImpl) GetFormula() string {
+	cell := c.getCell()
+	if cell == nil || cell.F == nil {
+		return ""
+	}
+	return cell.F.Content
+}
+
 // SetNumberFormat set cell number format with format code
 // https://docs.microsoft.com/en-us/dotnet/api/documentformat.openxml.spreadsheet.numberingformat?view=openxml-2.8.1
 func (c *cellImpl) SetNumberFormat(formatCode string) Cell {
-	numFmtID := c.sheet.prepareNumberingFormat(formatCode)
-	cellFormat := c.prepareCellFormat()
-	cellFormat.ApplyNumberFormat = true
-	cellFormat.NumFmtID = numFmtID
+	// numFmtID := c.sheet.prepareNumberingFormat(formatCode)
+	// cellFormat := c.prepareCellFormat()
+	// cellFormat.ApplyNumberFormat = true
+	// cellFormat.NumFmtID = numFmtID
+	style := c.GetStyle()
+	style.NumberFormat.Format = formatCode
+	style.NumberFormat.NumberFormatID = 0
+	c.SetStyle(style)
+	return c
+}
+
+func (c *cellImpl) SetCellBorder(borderStyle BorderStyle, borderColor Color, top, right, bottom, left bool) Cell {
+	c.sheet.SetCellBorder(c.col, c.row, borderStyle, borderColor, top, right, bottom, left)
 	return c
 }

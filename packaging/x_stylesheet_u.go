@@ -1,6 +1,10 @@
 package packaging
 
-import "encoding/xml"
+import (
+	"encoding/xml"
+
+	"github.com/shopspring/decimal"
+)
 
 // XStyleSheetU fix XML ns for XStyleSheet
 type XStyleSheetU struct {
@@ -32,16 +36,21 @@ type XFontsU struct {
 
 // XStyleSheetFontU fix XML ns for XStyleSheetFont
 type XStyleSheetFontU struct {
-	Sz      *XIntValAttrU     `xml:"sz"`
-	Color   *XColorU          `xml:"color"`
-	Name    *XValAttrElementU `xml:"name"`
-	Family  *XValAttrElementU `xml:"family"`
-	Scheme  *XValAttrElementU `xml:"scheme"`
-	B       *XBoolValAttrU    `xml:"b,omitempty"`
-	I       *XBoolValAttrU    `xml:"i,omitempty"`
-	U       *XValAttrElementU `xml:"u,omitempty"`
-	Strike  *XValAttrElementU `xml:"strike,omitempty"`
-	Charset *XValAttrElement  `xml:"charset,omitempty"` // Character Set
+	B         *XBoolValAttr    `xml:"b,omitempty"`         // Bold
+	Charset   *XIntValAttr     `xml:"charset,omitempty"`   // Character Set
+	Color     *XColor          `xml:"color,omitempty"`     // Text Color
+	Condense  *XBoolValAttr    `xml:"condense,omitempty"`  // Condense
+	Extend    *XBoolValAttr    `xml:"extend,omitempty"`    // Extend
+	Family    *XIntValAttr     `xml:"family"`              // Font Family
+	I         *XBoolValAttr    `xml:"i,omitempty"`         // Italic
+	Name      *XValAttrElement `xml:"name"`                // Font Name
+	Outline   *XBoolValAttr    `xml:"outline,omitempty"`   // Outline
+	Scheme    *XValAttrElement `xml:"scheme,omitempty"`    // Scheme
+	Shadow    *XBoolValAttr    `xml:"shadow,omitempty"`    // Shadow
+	Strike    *XBoolValAttr    `xml:"strike,omitempty"`    // Strike Through. TextStrikeValues
+	Sz        *XIntValAttr     `xml:"sz"`                  // Font Size
+	U         *XValAttrElement `xml:"u,omitempty"`         // Underline. TextUnderlineValues
+	VertAlign *XValAttrElement `xml:"vertAlign,omitempty"` // Vertical Alignment
 }
 
 // XIntValAttrU fix XML ns for XIntValAttr
@@ -51,16 +60,16 @@ type XIntValAttrU struct {
 
 // XBoolValAttrU fix XML ns for XBoolValAttr
 type XBoolValAttrU struct {
-	Val bool `xml:"val,attr"`
+	Val BoolAttr `xml:"val,attr"`
 }
 
 // XColorU fix XML ns for XColor
 type XColorU struct {
-	Theme   string `xml:"theme,attr"`
-	RGB     string `xml:"rgb,attr,omitempty"`
-	Auto    bool   `xml:"auto,attr,omitempty"`
-	Indexed string `xml:"indexed,attr,omitempty"`
-	Tint    string `xml:"tint,attr,omitempty"`
+	Theme   OmitIntAttr     `xml:"theme,attr"`
+	RGB     string          `xml:"rgb,attr,omitempty"`
+	Auto    BoolAttr        `xml:"auto,attr,omitempty"`
+	Indexed OmitIntAttr     `xml:"indexed,attr,omitempty"`
+	Tint    decimal.Decimal `xml:"tint,attr,omitempty"`
 }
 
 // XFillsU fix XML ns for XFills
@@ -77,54 +86,30 @@ type XFillU struct {
 
 // XPatternFillU fix XML ns for XPatternFill
 type XPatternFillU struct {
-	PatternType string `xml:"patternType,attr"`
+	PatternType     string  `xml:"patternType,attr"`
+	BackgroundColor *XColor `xml:"bgColor,omitempty"`
+	ForegroundColor *XColor `xml:"fgColor,omitempty"`
 }
 
 // XBordersU fix XML ns for XBorders
 type XBordersU struct {
 	Count int `xml:"count,attr"`
 
-	Border []*XBorderU `xml:"border"`
-}
-
-// XBorderU fix XML ns for XBorder
-type XBorderU struct {
-	Left     string `xml:"left"`
-	Right    string `xml:"right"`
-	Top      string `xml:"top"`
-	Bottom   string `xml:"bottom"`
-	Diagonal string `xml:"diagonal"`
+	Border []*XBorder `xml:"border"`
 }
 
 // XCellStyleXfsU fix XML ns for XCellStyleXfs
 type XCellStyleXfsU struct {
 	Count int `xml:"count,attr"`
 
-	Xf []*XXfU `xml:"xf"`
-}
-
-// XXfU fix XML ns for XXf
-type XXfU struct {
-	NumFmtID          int  `xml:"numFmtId,attr"`
-	FontID            int  `xml:"fontId,attr"`
-	FillID            int  `xml:"fillId,attr"`
-	BorderID          int  `xml:"borderId,attr"`
-	XfID              int  `xml:"xfId,attr,omitempty"`
-	ApplyAlignment    bool `xml:"applyAlignment,attr,omitempty"`
-	ApplyBorder       bool `xml:"applyBorder,attr,omitempty"`
-	ApplyFill         bool `xml:"applyFill,attr,omitempty"`
-	ApplyFont         bool `xml:"applyFont,attr,omitempty"`
-	ApplyNumberFormat bool `xml:"applyNumberFormat,attr,omitempty"`
-	ApplyProtection   bool `xml:"applyProtection,attr,omitempty"`
-	PivotButton       bool `xml:"pivotButton,attr,omitempty"`
-	QuotePrefix       bool `xml:"quotePrefix,attr,omitempty"`
+	Xf []*XXf `xml:"xf"`
 }
 
 // XCellXfsU fix XML ns for XCellXfs
 type XCellXfsU struct {
 	Count int `xml:"count,attr"`
 
-	Xf []*XXfU `xml:"xf"`
+	Xf []*XXf `xml:"xf"`
 }
 
 // XCellStylesU fix XML ns for XCellStyles
@@ -189,5 +174,5 @@ type XNumFmtsU struct {
 // XNumFmtU fix XML ns for XNumFmt
 type XNumFmtU struct {
 	FormatCode string `xml:"formatCode,attr"`
-	NumFmtId   int    `xml:"numFmtId,attr"`
+	NumFmtID   int    `xml:"numFmtId,attr"`
 }

@@ -64,13 +64,13 @@ type XSheetData struct {
 type XRow struct {
 	R              int             `xml:"r,attr"` // row number
 	Spans          string          `xml:"spans,attr,omitempty"`
-	Hidden         bool            `xml:"hidden,attr,omitempty"`
+	Hidden         BoolAttr        `xml:"hidden,attr,omitempty"`
 	C              []*XC           `xml:"c"`
 	Ht             string          `xml:"ht,attr,omitempty"`
-	CustomHeight   bool            `xml:"customHeight,attr,omitempty"`
+	CustomHeight   BoolAttr        `xml:"customHeight,attr,omitempty"`
 	OutlineLevel   uint8           `xml:"outlineLevel,attr,omitempty"`
 	S              int             `xml:"s,attr,omitempty"`            // row style id
-	CustomFormat   bool            `xml:"customFormat,attr,omitempty"` // enable row custom format
+	CustomFormat   BoolAttr        `xml:"customFormat,attr,omitempty"` // enable row custom format
 	X14acDyDescent decimal.Decimal `xml:"x14ac:dyDescent,attr"`
 }
 
@@ -87,10 +87,10 @@ type XC struct {
 
 // XF F node
 type XF struct {
-	Content string `xml:",chardata"`
-	T       string `xml:"t,attr,omitempty"`   // Formula type
-	Ref     string `xml:"ref,attr,omitempty"` // Shared formula ref
-	Si      int    `xml:"si,attr,omitempty"`  // Shared formula index
+	Content string      `xml:",chardata"`
+	T       OmitIntAttr `xml:"t,attr,omitempty"`   // Formula type
+	Ref     string      `xml:"ref,attr,omitempty"` // Shared formula ref
+	Si      int         `xml:"si,attr,omitempty"`  // Shared formula index
 }
 
 // XPageMargins PageMargins node
@@ -112,12 +112,12 @@ type XCols struct {
 type XCol struct {
 	Min          int             `xml:"min,attr"`
 	Max          int             `xml:"max,attr"`
-	BestFit      bool            `xml:"bestFit,attr,omitempty"`
-	Collapsed    bool            `xml:"collapsed,attr,omitempty"`
-	CustomWidth  bool            `xml:"customWidth,attr,omitempty"`
-	Hidden       bool            `xml:"hidden,attr,omitempty"`
+	BestFit      BoolAttr        `xml:"bestFit,attr,omitempty"`
+	Collapsed    BoolAttr        `xml:"collapsed,attr,omitempty"`
+	CustomWidth  BoolAttr        `xml:"customWidth,attr,omitempty"`
+	Hidden       BoolAttr        `xml:"hidden,attr,omitempty"`
 	OutlineLevel uint8           `xml:"outlineLevel,attr,omitempty"`
-	Phonetic     bool            `xml:"phonetic,attr,omitempty"`
+	Phonetic     BoolAttr        `xml:"phonetic,attr,omitempty"`
 	Style        int             `xml:"style,attr,omitempty"`
 	Width        decimal.Decimal `xml:"width,attr,omitempty"`
 }

@@ -150,11 +150,6 @@ type XGs struct {
 	SchemeClr *XSchemeClr `xml:"a:schemeClr"`
 }
 
-// XValAttrElement Val type
-type XValAttrElement struct {
-	Val string `xml:"val,attr"`
-}
-
 // XLin Lin type
 type XLin struct {
 	Ang    string `xml:"ang,attr"`
