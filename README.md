@@ -200,7 +200,7 @@ func main() {
 - [x] File: NewFile, OpenFile, SaveFile, Save, Sheets
 - [x] Sheet:
     - [x] NewSheet, OpenSheet
-    - [x] Name, SetCellValue, Cell, AxisCell, SetAxisCellValue, SetColumnWidth, GetColumnWidth, MergeCell, SetColumnStyle, GetColumnStyle
+    - [x] Name, SetCellValue, Cell, AxisCell, SetAxisCellValue, SetColumnWidth, GetColumnWidth, MergeCell, SetColumnStyle, GetColumnStyle, MaxRow
 - [x] Cell:
     - [x] Row, Col
     - [x] SetValue, SetIntValue, SetFloatValue, SetFloatValuePrec, SetStringValue, SetBoolValue, SetDefaultValue, SetTimeValue, SetDateValue, SetDurationValue, SetStyle, SetCellBorder, SetFormula

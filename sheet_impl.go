@@ -747,3 +747,15 @@ func (s *sheetImpl) SetAxisCellBorder(axis Axis, borderStyle BorderStyle, border
 	col, row := axis.C()
 	return s.SetCellBorder(col, row, borderStyle, borderColor, top, right, bottom, left)
 }
+
+func (s *sheetImpl) MaxRow() int {
+	sheetData := s.getSheetData()
+
+	maxRow := 0
+	for _, r := range sheetData.Row {
+		if r.R > maxRow {
+			maxRow = r.R
+		}
+	}
+	return maxRow
+}

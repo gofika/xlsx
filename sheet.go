@@ -78,4 +78,7 @@ type Sheet interface {
 	// Example:
 	//     sheet.SetAxisCellBorder("A1", BorderStyleThin, Color{Color: "FF0000"}, false, true, false, true)
 	SetAxisCellBorder(axis Axis, borderStyle BorderStyle, borderColor Color, top, right, bottom, left bool) Sheet
+
+	// MaxRow get max row
+	MaxRow() int
 }
