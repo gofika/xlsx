@@ -86,11 +86,11 @@ func main() {
     sheet.AxisCell("F2").SetIntValue(200)
     sheet.AxisCell("F3").SetFormula("SUM(F1:F2)")
 
-	// SetColumnStyle example
-	fStyle := sheet.GetColumnStyle(xlsx.ColumnNumber("F"))
-	fStyle.Alignment.Horizontal = xlsx.HorizontalAlignmentLeft
-	fStyle.Alignment.Vertical = xlsx.VerticalAlignmentCenter
-	sheet.SetColumnStyle(xlsx.ColumnNumber("F"), fStyle)
+    // SetColumnStyle example
+    fStyle := sheet.GetColumnStyle(xlsx.ColumnNumber("F"))
+    fStyle.Alignment.Horizontal = xlsx.HorizontalAlignmentLeft
+    fStyle.Alignment.Vertical = xlsx.VerticalAlignmentCenter
+    sheet.SetColumnStyle(xlsx.ColumnNumber("F"), fStyle)
 
     // set cell border
     sheet.SetAxisCellBorder("F3", xlsx.BorderStyleThin, xlsx.Color{Color: "0000FF"}, true, true, true, true)
