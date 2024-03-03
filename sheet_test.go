@@ -78,6 +78,7 @@ func TestSetCellValue(t *testing.T) {
 	sheet.AxisCell("F2").SetIntValue(200)
 	sheet.AxisCell("F3").SetFormula("SUM(F1:F2)")
 
+	// SetColStyle example
 	fStyle := sheet.GetColStyle(ColumnNumber("F"))
 	fStyle.Alignment.Horizontal = HorizontalAlignmentLeft
 	fStyle.Alignment.Vertical = VerticalAlignmentCenter

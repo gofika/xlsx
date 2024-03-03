@@ -86,6 +86,12 @@ func main() {
     sheet.AxisCell("F2").SetIntValue(200)
     sheet.AxisCell("F3").SetFormula("SUM(F1:F2)")
 
+	// SetColStyle example
+	fStyle := sheet.GetColStyle(xlsx.ColumnNumber("F"))
+	fStyle.Alignment.Horizontal = xlsx.HorizontalAlignmentLeft
+	fStyle.Alignment.Vertical = xlsx.VerticalAlignmentCenter
+	sheet.SetColStyle(xlsx.ColumnNumber("F"), fStyle)
+
     // set cell border
     sheet.SetAxisCellBorder("F3", xlsx.BorderStyleThin, xlsx.Color{Color: "0000FF"}, true, true, true, true)
 
@@ -194,7 +200,7 @@ func main() {
 - [x] File: NewFile, OpenFile, SaveFile, Save, Sheets
 - [x] Sheet:
     - [x] NewSheet, OpenSheet
-    - [x] Name, SetCellValue, Cell, AxisCell, SetAxisCellValue, SetColumnWidth, GetColumnWidth, MergeCell
+    - [x] Name, SetCellValue, Cell, AxisCell, SetAxisCellValue, SetColumnWidth, GetColumnWidth, MergeCell, SetColStyle, GetColStyle
 - [x] Cell:
     - [x] Row, Col
     - [x] SetValue, SetIntValue, SetFloatValue, SetFloatValuePrec, SetStringValue, SetBoolValue, SetDefaultValue, SetTimeValue, SetDateValue, SetDurationValue, SetStyle, SetCellBorder, SetFormula
