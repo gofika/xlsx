@@ -1,5 +1,7 @@
 package xlsx
 
+import "github.com/shopspring/decimal"
+
 // Sheet sheet operator
 type Sheet interface {
 	// Name sheet name
@@ -33,13 +35,13 @@ type Sheet interface {
 	//
 	// Example:
 	//     sheet.SetColumnWidth("A:B", 20)
-	SetColumnWidth(columnRange string, width int) Sheet
+	SetColumnWidth(columnRange string, width decimal.Decimal) Sheet
 
 	// GetColumnWidth get column width
 	//
 	// Example:
 	//	sheet.GetColumnWidth("A") // returns 20
-	GetColumnWidth(columnName string) int
+	GetColumnWidth(columnName string) decimal.Decimal
 
 	// MergeCell merge cell
 	//
@@ -58,6 +60,12 @@ type Sheet interface {
 
 	// SetAxisCellStyle set cell style
 	SetAxisCellStyle(axis Axis, style Style) Sheet
+
+	// GetColStyle get column style
+	GetColStyle(col int) Style
+
+	// SetColStyle set column style
+	SetColStyle(col int, style Style) Sheet
 
 	// SetCellBorder set cell border
 	//

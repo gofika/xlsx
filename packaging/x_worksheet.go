@@ -49,9 +49,18 @@ type XSheetView struct {
 }
 
 // XSheetFormatPr SheetFormatPr node
+// https://learn.microsoft.com/en-us/dotnet/api/documentformat.openxml.spreadsheet.sheetformatproperties?view=openxml-3.0.1
 type XSheetFormatPr struct {
-	DefaultRowHeight decimal.Decimal `xml:"defaultRowHeight,attr"`
-	X14acDyDescent   decimal.Decimal `xml:"x14ac:dyDescent,attr"`
+	DefaultRowHeight decimal.Decimal `xml:"defaultRowHeight,attr"` // Default Row Height. Default row height measured in point size. Optimization so we don't have to write the height on all rows. This can be written out if most rows have custom height, to achieve the optimization.
+	// X14acDyDescent   decimal.Decimal `xml:"x14ac:dyDescent,attr"`
+	DefaultColWidth OmitDecimalAttr `xml:"defaultColWidth,attr,omitempty"` // Default Column Width. Default column width measured as the number of characters of the maximum digit width of the normal style's font.
+	BaseColWidth    OmitUIntAttr    `xml:"baseColWidth,attr,omitempty"`    // Base Column Width. Specifies the number of characters of the maximum digit width of the normal style's font. This value does not include margin padding or extra padding for gridlines. It is only the number of characters.
+	CustomHeight    BoolAttr        `xml:"customHeight,attr,omitempty"`    // Custom Height. 'True' if defaultRowHeight value has been manually set, or is different from the default value.
+	ZeroHeight      BoolAttr        `xml:"zeroHeight,attr,omitempty"`      // Hidden By Default. 'True' if rows are hidden by default. This setting is an optimization used when most rows of the sheet are hidden. In this case, instead of writing out every row and specifying hidden, it is much shorter to only write out the rows that are not hidden, and specify here that rows are hidden by default, and only not hidden if specified.
+	ThickTop        BoolAttr        `xml:"thickTop,attr,omitempty"`        // Thick Top Border. 'True' if rows have a thick top border by default.
+	ThickBottom     BoolAttr        `xml:"thickBottom,attr,omitempty"`     // Thick Bottom Border. 'True' if rows have a thick bottom border by default.
+	OutlineLevelRow OmitUByteAttr   `xml:"outlineLevelRow,attr,omitempty"` // Maximum Outline Row. Highest number of outline level for rows in this sheet. These values shall be in synch with the actual sheet outline levels.
+	OutlineLevelCol OmitUByteAttr   `xml:"outlineLevelCol,attr,omitempty"` // Maximum Outline Column. Highest number of outline levels for columns in this sheet. These values shall be in synch with the actual sheet outline levels.
 }
 
 // XSheetData SheetData node
@@ -71,7 +80,7 @@ type XRow struct {
 	OutlineLevel   uint8           `xml:"outlineLevel,attr,omitempty"`
 	S              int             `xml:"s,attr,omitempty"`            // row style id
 	CustomFormat   BoolAttr        `xml:"customFormat,attr,omitempty"` // enable row custom format
-	X14acDyDescent decimal.Decimal `xml:"x14ac:dyDescent,attr"`
+	X14acDyDescent OmitDecimalAttr `xml:"x14ac:dyDescent,attr,omitempty"`
 }
 
 // XC This collection represents a cell in the worksheet. Information about the cell's location (reference), value, data type, formatting, and formula is expressed here.
@@ -119,7 +128,7 @@ type XCol struct {
 	OutlineLevel uint8           `xml:"outlineLevel,attr,omitempty"`
 	Phonetic     BoolAttr        `xml:"phonetic,attr,omitempty"`
 	Style        int             `xml:"style,attr,omitempty"`
-	Width        decimal.Decimal `xml:"width,attr,omitempty"`
+	Width        decimal.Decimal `xml:"width,attr"`
 }
 
 // XMergeCells MergeCells node
@@ -152,7 +161,7 @@ func NewDefaultXWorksheet() *XWorksheet {
 		},
 		SheetFormatPr: &XSheetFormatPr{
 			DefaultRowHeight: decimal.NewFromInt(15),
-			X14acDyDescent:   decimal.NewFromFloat(0.25),
+			// X14acDyDescent:   decimal.NewFromFloat(0.25),
 		},
 		SheetData: &XSheetData{},
 		PageMargins: &XPageMargins{

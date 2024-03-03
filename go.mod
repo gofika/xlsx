@@ -7,7 +7,10 @@ require (
 	github.com/stretchr/testify v1.8.4
 )
 
+require golang.org/x/crypto v0.19.0 // indirect
+
 require (
+	github.com/alexmullins/zip v0.0.0-20180717182244-4affb64b04d0
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect

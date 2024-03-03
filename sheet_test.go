@@ -71,12 +71,17 @@ func TestSetCellValue(t *testing.T) {
 	sheet.AxisCell("D4").
 		SetTimeValue(timeVal).
 		SetNumberFormat("yyyy-mm-dd hh:mm:ss")
-	sheet.SetColumnWidth("D:D", 20)
+	sheet.SetColumnWidth("D:D", decimal.NewFromInt(20))
 
 	// SetFormula example
 	sheet.AxisCell("F1").SetIntValue(100)
 	sheet.AxisCell("F2").SetIntValue(200)
 	sheet.AxisCell("F3").SetFormula("SUM(F1:F2)")
+
+	fStyle := sheet.GetColStyle(ColumnNumber("F"))
+	fStyle.Alignment.Horizontal = HorizontalAlignmentLeft
+	fStyle.Alignment.Vertical = VerticalAlignmentCenter
+	sheet.SetColStyle(ColumnNumber("F"), fStyle)
 
 	err := f.SaveFile(docPath)
 	assert.Nil(t, err)

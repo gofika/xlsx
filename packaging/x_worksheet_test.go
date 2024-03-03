@@ -15,7 +15,7 @@ const defaultWorksheetTemplate = `<?xml version="1.0" encoding="UTF-8" standalon
     <sheetViews>
         <sheetView tabSelected="1" workbookViewId="0"></sheetView>
     </sheetViews>
-    <sheetFormatPr defaultRowHeight="15" x14ac:dyDescent="0.25"></sheetFormatPr>
+    <sheetFormatPr defaultRowHeight="15"></sheetFormatPr>
     <sheetData></sheetData>
     <pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"></pageMargins>
 </worksheet>`
