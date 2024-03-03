@@ -672,15 +672,13 @@ func (s *sheetImpl) MergeCell(start Axis, end Axis) Sheet {
 	}
 	sheetData := s.getSheetData()
 	// remove cell
-	for row := startRow; row <= endRow; row++ {
-		for col := startCol; col <= endCol; col++ {
-			cell := s.getCell(col, row)
-			if cell != nil {
-				for i, c := range sheetData.Row[row-1].C {
-					if c.R == cell.R {
-						sheetData.Row[row-1].C = append(sheetData.Row[row-1].C[:i], sheetData.Row[row-1].C[i+1:]...)
-						break
-					}
+	for _, r := range sheetData.Row {
+		if r.R >= startRow && r.R <= endRow {
+			for j, c := range r.C {
+				col, _ := CellNameToCoordinates(c.R)
+				if col >= startCol && col <= endCol {
+					r.C = append(r.C[:j], r.C[j+1:]...)
+					break
 				}
 			}
 		}
