@@ -479,17 +479,17 @@ func (s *sheetImpl) prepareFormat(style Style) int {
 			}
 			if numFmtID == -1 {
 				// custom format
-				for i, nf := range styleSheet.NumFmts.NumFmt {
+				for _, nf := range styleSheet.NumFmts.NumFmt {
 					if numFmt.FormatCode == nf.FormatCode {
-						numFmtID = i
+						numFmtID = nf.NumFmtID
 						break
 					}
 				}
 			}
 		} else {
-			for i, nf := range styleSheet.NumFmts.NumFmt {
+			for _, nf := range styleSheet.NumFmts.NumFmt {
 				if numFmt.Equal(nf) {
-					numFmtID = i
+					numFmtID = nf.NumFmtID
 					break
 				}
 			}
