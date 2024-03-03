@@ -235,7 +235,7 @@ func (s *sheetImpl) getCellFormat(col, row int) *packaging.XXf {
 	}
 	styleSheet := s.getStyleSheet()
 	if formatID < len(styleSheet.CellXfs.Xf) {
-		return styleSheet.CellXfs.Xf[cell.S]
+		return styleSheet.CellXfs.Xf[formatID]
 	}
 	return s.getColFormat(col)
 }
