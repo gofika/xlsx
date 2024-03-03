@@ -376,7 +376,7 @@ func (s *sheetImpl) GetAxisCellStyle(axis Axis) Style {
 	return s.GetCellStyle(axis.C())
 }
 
-func (s *sheetImpl) GetColStyle(col int) Style {
+func (s *sheetImpl) GetColumnStyle(col int) Style {
 	colFormat := s.getColFormat(col)
 	var style Style
 	// Font
@@ -535,7 +535,7 @@ func (s *sheetImpl) SetAxisCellStyle(axis Axis, style Style) Sheet {
 	return s.SetCellStyle(col, row, style)
 }
 
-func (s *sheetImpl) SetColStyle(col int, style Style) Sheet {
+func (s *sheetImpl) SetColumnStyle(col int, style Style) Sheet {
 	formatID := s.prepareFormat(style)
 	c := s.prepareCol(col)
 	c.Style = formatID

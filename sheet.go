@@ -61,11 +61,11 @@ type Sheet interface {
 	// SetAxisCellStyle set cell style
 	SetAxisCellStyle(axis Axis, style Style) Sheet
 
-	// GetColStyle get column style
-	GetColStyle(col int) Style
+	// GetColumnStyle get column style
+	GetColumnStyle(col int) Style
 
-	// SetColStyle set column style
-	SetColStyle(col int, style Style) Sheet
+	// SetColumnStyle set column style
+	SetColumnStyle(col int, style Style) Sheet
 
 	// SetCellBorder set cell border
 	//
