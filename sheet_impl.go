@@ -471,11 +471,9 @@ func (s *sheetImpl) prepareFormat(style Style) int {
 		numFmtID = numFmt.NumFmtID
 	} else {
 		if numFmt.NumFmtID == 0 && numFmt.FormatCode != "" {
-			for i, formatCode := range builtInNumFmt {
-				if numFmt.FormatCode == formatCode {
-					numFmtID = i
-					break
-				}
+			builtInID, ok := builtInNumFmtMap[numFmt.FormatCode]
+			if ok {
+				numFmtID = builtInID
 			}
 			if numFmtID == -1 {
 				// custom format
@@ -677,6 +675,9 @@ func (s *sheetImpl) MergeCell(start Axis, end Axis) Sheet {
 			for j, c := range r.C {
 				col, _ := CellNameToCoordinates(c.R)
 				if col >= startCol && col <= endCol {
+					if col == startCol && r.R == startRow { // skip start cell
+						continue
+					}
 					r.C = append(r.C[:j], r.C[j+1:]...)
 					break
 				}
