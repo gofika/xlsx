@@ -181,7 +181,14 @@ func (c *cellImpl) GetStringValue() string {
 	if cell == nil {
 		return ""
 	}
-	return c.getSharedStrings().Get(cell.V)
+	switch cell.T {
+	case "str":
+		return cell.V
+	case "s":
+		return c.getSharedStrings().Get(cell.V)
+	default:
+		return cell.V
+	}
 }
 
 // SetStringValue set cell value for string type
