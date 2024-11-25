@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/gofika/util v0.0.0-20230405042253-4b529967f1ff
 	github.com/shopspring/decimal v1.4.0
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 )
 
 require (
